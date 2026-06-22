@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AusFed BDR Coach</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🏛️</span>
+        <div>
+          <span class="logo-title">AusFed BDR Coach</span>
+          <span class="logo-sub">Salesforce · Australian Federal Government</span>
+        </div>
+      </div>
+      <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="roleplay">
+          <span class="tab-icon">📞</span> Cold Call
+        </button>
+        <button class="tab-btn" data-tab="discovery">
+          <span class="tab-icon">🎯</span> Discovery
+        </button>
+        <button class="tab-btn" data-tab="lessons">
+          <span class="tab-icon">📚</span> Lessons
+        </button>
+        <button class="tab-btn" data-tab="drills">
+          <span class="tab-icon">⚡</span> Drills
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════ COLD CALL TAB ══════ -->
+  <section id="tab-roleplay" class="tab-pane active">
+    <div class="section-intro">
+      <h2>Cold Call Practice</h2>
+      <p>Pick an APS contact and dial in. Claude plays the prospect — your job is to earn a discovery meeting, not pitch a product. Use the Sandler checklist to track your call quality.</p>
+    </div>
+
+    <div class="roleplay-layout">
+
+      <!-- Setup panel -->
+      <div class="roleplay-setup" id="roleplay-setup">
+        <h3>Choose your prospect</h3>
+        <div class="persona-grid">
+          <label class="persona-card">
+            <input type="radio" name="persona" value="cio" checked />
+            <div class="persona-body">
+              <span class="persona-emoji">💻</span>
+              <strong>Michael Draper</strong>
+              <span class="persona-title">Chief Information Officer</span>
+              <span class="persona-org">Dept. of Employment &amp; Workplace</span>
+              <span class="persona-tag direct">Direct &amp; time-poor</span>
+            </div>
+          </label>
+          <label class="persona-card">
+            <input type="radio" name="persona" value="procurement" />
+            <div class="persona-body">
+              <span class="persona-emoji">📋</span>
+              <strong>Sandra Keane</strong>
+              <span class="persona-title">ICT Procurement Manager</span>
+              <span class="persona-org">Department of Finance</span>
+              <span class="persona-tag process">Process-oriented</span>
+            </div>
+          </label>
+          <label class="persona-card">
+            <input type="radio" name="persona" value="program" />
+            <div class="persona-body">
+              <span class="persona-emoji">🚀</span>
+              <strong>Raj Chopra</strong>
+              <span class="persona-title">Program Director</span>
+              <span class="persona-org">Services Australia</span>
+              <span class="persona-tag curious">Curious but cautious</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="call-tips">
+          <h4>💡 Before you dial — your goal</h4>
+          <ul>
+            <li>Your job is to qualify and book a meeting — not pitch, not demo</li>
+            <li>Lead with curiosity about their agency and programs, not Salesforce features</li>
+            <li>Get permission to ask one question — earn each next step</li>
+            <li>If you freeze, say what you'd actually say out loud in real life</li>
+          </ul>
+        </div>
+
+        <button class="btn-primary btn-large" id="start-call-btn">
+          📞 Start Cold Call
+        </button>
+      </div>
+
+      <!-- Call area: chat + sandler checklist -->
+      <div class="call-area hidden" id="call-area">
+
+        <!-- Chat -->
+        <div class="roleplay-chat" id="roleplay-chat">
+          <div class="chat-header">
+            <div class="call-status">
+              <span class="call-dot"></span>
+              <span id="call-status-text">Calling…</span>
+            </div>
+            <div class="prospect-info">
+              <span id="chat-prospect-name"></span>
+              <span id="chat-prospect-title"></span>
+            </div>
+            <button class="btn-end-call" id="end-call-btn">End Call</button>
+          </div>
+
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-hint">The phone is ringing…</div>
+          </div>
+
+          <div class="chat-input-area">
+            <textarea
+              id="chat-input"
+              placeholder="Type what you'd say out loud…"
+              rows="2"
+              disabled
+            ></textarea>
+            <button class="btn-send" id="chat-send-btn" disabled>Send</button>
+          </div>
+
+          <div class="chat-coaching-bar" id="coaching-bar"></div>
+        </div>
+
+        <!-- Sandler Checklist -->
+        <div class="sandler-tracker">
+          <h4>Call Checklist</h4>
+          <p class="tracker-sub">Tick each as you earn it</p>
+          <div class="sandler-items">
+            <label class="sandler-item">
+              <input type="checkbox" data-sandler="permission" />
+              <div class="sandler-body">
+                <strong>Permission granted</strong>
+                <span>They agreed to your upfront contract</span>
+              </div>
+            </label>
+            <label class="sandler-item">
+              <input type="checkbox" data-sandler="situation" />
+              <div class="sandler-body">
+                <strong>Situation understood</strong>
+                <span>You know their current state</span>
+              </div>
+            </label>
+            <label class="sandler-item">
+              <input type="checkbox" data-sandler="pain" />
+              <div class="sandler-body">
+                <strong>Pain surfaced</strong>
+                <span>A real challenge was mentioned</span>
+              </div>
+            </label>
+            <label class="sandler-item">
+              <input type="checkbox" data-sandler="relevance" />
+              <div class="sandler-body">
+                <strong>Relevance established</strong>
+                <span>They see why Salesforce could help</span>
+              </div>
+            </label>
+            <label class="sandler-item">
+              <input type="checkbox" data-sandler="nextstep" />
+              <div class="sandler-body">
+                <strong>Next step committed</strong>
+                <span>Meeting booked or agreed to</span>
+              </div>
+            </label>
+          </div>
+          <div class="tracker-progress" id="sandler-progress">0 of 5 steps</div>
+          <div class="tracker-badge hidden" id="sandler-badge">
+            ✅ Qualified for discovery — brief your AE
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ DISCOVERY TAB ══════ -->
+  <section id="tab-discovery" class="tab-pane hidden">
+    <div class="section-intro">
+      <h2>MEDDIC Discovery Practice</h2>
+      <p>You've booked the meeting — now run the discovery. Your goal: uncover all six MEDDIC elements. When you're done, hit "Analyze Discovery" for AI coaching on your technique.</p>
+    </div>
+
+    <div class="roleplay-layout">
+
+      <!-- Setup panel -->
+      <div class="discovery-setup" id="discovery-setup">
+        <h3>Choose your discovery prospect</h3>
+        <div class="persona-grid">
+          <label class="persona-card">
+            <input type="radio" name="disc-persona" value="cio" checked />
+            <div class="persona-body">
+              <span class="persona-emoji">💻</span>
+              <strong>Michael Draper</strong>
+              <span class="persona-title">CIO — Grant Management Modernisation</span>
+              <span class="persona-org">Dept. of Employment &amp; Workplace</span>
+              <span class="persona-tag direct">$28M FY27 program</span>
+            </div>
+          </label>
+          <label class="persona-card">
+            <input type="radio" name="disc-persona" value="procurement" />
+            <div class="persona-body">
+              <span class="persona-emoji">📋</span>
+              <strong>Sandra Keane</strong>
+              <span class="persona-title">Procurement — WofG Panel Adviser</span>
+              <span class="persona-org">Department of Finance</span>
+              <span class="persona-tag process">Knows every pathway</span>
+            </div>
+          </label>
+          <label class="persona-card">
+            <input type="radio" name="disc-persona" value="program" />
+            <div class="persona-body">
+              <span class="persona-emoji">🚀</span>
+              <strong>Raj Chopra</strong>
+              <span class="persona-title">Program Director — Digital First</span>
+              <span class="persona-org">Services Australia</span>
+              <span class="persona-tag curious">$12M confirmed · 30% call centre KPI</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="call-tips">
+          <h4>💡 MEDDIC reminder</h4>
+          <ul>
+            <li><strong>M</strong> — Metrics: What does success look like in measurable terms?</li>
+            <li><strong>E</strong> — Economic Buyer: Who controls the budget and signs off?</li>
+            <li><strong>D</strong> — Decision Criteria: What are they evaluating vendors against?</li>
+            <li><strong>D</strong> — Decision Process: What's the procurement path and timeline?</li>
+            <li><strong>I</strong> — Identify Pain: What's the core problem and its consequence?</li>
+            <li><strong>C</strong> — Champion: Who will advocate for you internally?</li>
+          </ul>
+        </div>
+
+        <button class="btn-primary btn-large" id="start-discovery-btn">
+          🎯 Start Discovery Meeting
+        </button>
+      </div>
+
+      <!-- Discovery call area -->
+      <div class="call-area hidden" id="disc-call-area">
+
+        <!-- Chat -->
+        <div class="roleplay-chat" id="disc-chat">
+          <div class="chat-header">
+            <div class="call-status">
+              <span class="call-dot call-dot-blue"></span>
+              <span id="disc-status-text">Discovery meeting</span>
+            </div>
+            <div class="prospect-info">
+              <span id="disc-prospect-name"></span>
+              <span id="disc-prospect-title"></span>
+            </div>
+            <button class="btn-end-call" id="end-discovery-btn">End Meeting</button>
+          </div>
+
+          <div class="chat-messages" id="disc-messages">
+            <div class="chat-hint">The meeting is starting…</div>
+          </div>
+
+          <div class="chat-input-area">
+            <textarea
+              id="disc-input"
+              placeholder="Ask a discovery question…"
+              rows="2"
+              disabled
+            ></textarea>
+            <button class="btn-send" id="disc-send-btn" disabled>Send</button>
+          </div>
+        </div>
+
+        <!-- MEDDIC Tracker -->
+        <div class="meddic-tracker">
+          <h4>MEDDIC Tracker</h4>
+          <p class="tracker-sub">Tick as you uncover each element</p>
+          <div class="meddic-items">
+            <label class="meddic-item">
+              <input type="checkbox" data-meddic="metrics" />
+              <div class="meddic-letter meddic-m">M</div>
+              <div class="meddic-info">
+                <strong>Metrics</strong>
+                <span>Success in numbers</span>
+              </div>
+            </label>
+            <label class="meddic-item">
+              <input type="checkbox" data-meddic="economic" />
+              <div class="meddic-letter meddic-e">E</div>
+              <div class="meddic-info">
+                <strong>Economic Buyer</strong>
+                <span>Budget owner identified</span>
+              </div>
+            </label>
+            <label class="meddic-item">
+              <input type="checkbox" data-meddic="criteria">
+              <div class="meddic-letter meddic-d">D</div>
+              <div class="meddic-info">
+                <strong>Decision Criteria</strong>
+                <span>What they're evaluating</span>
+              </div>
+            </label>
+            <label class="meddic-item">
+              <input type="checkbox" data-meddic="process" />
+              <div class="meddic-letter meddic-d2">D</div>
+              <div class="meddic-info">
+                <strong>Decision Process</strong>
+                <span>Procurement path &amp; timeline</span>
+              </div>
+            </label>
+            <label class="meddic-item">
+              <input type="checkbox" data-meddic="pain" />
+              <div class="meddic-letter meddic-i">I</div>
+              <div class="meddic-info">
+                <strong>Identify Pain</strong>
+                <span>Core problem &amp; impact</span>
+              </div>
+            </label>
+            <label class="meddic-item">
+              <input type="checkbox" data-meddic="champion" />
+              <div class="meddic-letter meddic-c">C</div>
+              <div class="meddic-info">
+                <strong>Champion</strong>
+                <span>Internal advocate found</span>
+              </div>
+            </label>
+          </div>
+          <div class="tracker-progress" id="meddic-progress">0 of 6 elements</div>
+          <div class="tracker-badge hidden" id="meddic-badge">
+            🎯 Full MEDDIC — ready to analyze
+          </div>
+          <button class="btn-analyze hidden" id="analyze-btn">
+            Analyze Discovery →
+          </button>
+        </div>
+
+      </div>
+
+      <!-- MEDDIC Analysis panel -->
+      <div class="analysis-panel hidden" id="analysis-panel">
+        <div class="analysis-header">
+          <button class="btn-back" id="analysis-back-btn">← New Discovery</button>
+          <h3>MEDDIC Analysis</h3>
+        </div>
+        <div class="analysis-body" id="analysis-body">
+          <div class="lesson-loading">
+            <div class="spinner"></div>
+            <p>Analyzing your discovery…</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ LESSONS TAB ════════ -->
+  <section id="tab-lessons" class="tab-pane hidden">
+    <div class="section-intro">
+      <h2>Coaching Lessons</h2>
+      <p>Eight focused lessons covering phone confidence, AusFed context, MEDDIC, Sandler, and objection handling. Each delivers exact scripts you can use on your next call.</p>
+    </div>
+
+    <div class="lessons-layout">
+      <div class="lesson-grid" id="lesson-grid">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="lesson-content hidden" id="lesson-content">
+        <div class="lesson-content-header">
+          <button class="btn-back" id="lesson-back-btn">← Back to lessons</button>
+          <h3 id="lesson-content-title"></h3>
+        </div>
+        <div class="lesson-body" id="lesson-body">
+          <div class="lesson-loading">
+            <div class="spinner"></div>
+            <p>Loading your lesson…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ DRILLS TAB ═════════ -->
+  <section id="tab-drills" class="tab-pane hidden">
+    <div class="section-intro">
+      <h2>Objection Handling Drills</h2>
+      <p>An APS officer throws an objection — you respond. Get instant AI coaching on what worked, what to fix, and a better script you can steal for your next call.</p>
+    </div>
+
+    <div class="drills-layout">
+
+      <div class="drill-controls">
+        <div class="difficulty-select">
+          <span>Difficulty:</span>
+          <button class="diff-btn active" data-diff="easy">Easy</button>
+          <button class="diff-btn" data-diff="medium">Medium</button>
+          <button class="diff-btn" data-diff="hard">Hard</button>
+        </div>
+        <button class="btn-primary" id="new-drill-btn">New Objection →</button>
+      </div>
+
+      <div class="drill-card hidden" id="drill-card">
+        <div class="drill-context" id="drill-context"></div>
+        <div class="drill-persona" id="drill-persona"></div>
+        <div class="drill-objection" id="drill-objection"></div>
+      </div>
+
+      <div class="drill-loading hidden" id="drill-loading">
+        <div class="spinner"></div>
+        <p>Getting your next objection…</p>
+      </div>
+
+      <div class="drill-response-area hidden" id="drill-response-area">
+        <label class="response-label">Your response:</label>
+        <textarea
+          id="drill-response"
+          placeholder="Type how you'd respond to this objection…"
+          rows="4"
+        ></textarea>
+        <div class="response-actions">
+          <button class="btn-hint" id="hint-btn">Show hint</button>
+          <button class="btn-primary" id="submit-response-btn">Get feedback →</button>
+        </div>
+        <div class="drill-hint hidden" id="drill-hint">
+          💡 <strong>Sandler hint:</strong> Don't argue or cave. Acknowledge their reality first ("That makes sense"), then ask a curious question to understand more — never jump straight to positioning.
+        </div>
+      </div>
+
+      <div class="drill-feedback hidden" id="drill-feedback">
+        <h3>Coach's Feedback</h3>
+        <div class="feedback-body" id="feedback-body"></div>
+        <button class="btn-primary" id="next-drill-btn">Next Objection →</button>
+      </div>
+
+      <div class="drill-empty" id="drill-empty">
+        <div class="empty-icon">⚡</div>
+        <h3>Ready to drill?</h3>
+        <p>Hit "New Objection" and respond as you would on a real AusFed cold call. Each drill takes under 2 minutes and builds real muscle memory for government conversations.</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
