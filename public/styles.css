@@ -702,3 +702,12 @@ body {
 }
 .btn-compete-details:hover { background: #0176D3; }
 .compete-detail { padding: 32px; max-width: 900px; margin: 0 auto; }
+
+/* ── PERSONAS TAB ── */
+.personas-layout { display: grid; grid-template-columns: 220px 1fr; gap: 0; min-height: 600px; margin: 0 32px 48px; max-width: 1100px; }
+.personas-sidebar { background: #f8fafc; border-right: 1px solid #e5e7eb; padding: 16px 0; }
+.persona-group-label { font-size: 10px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 2px; padding: 4px 16px 8px; }
+.persona-list-btn { display: block; width: 100%; text-align: left; background: none; border: none; padding: 10px 16px; font-size: 13px; color: #444; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; }
+.persona-list-btn:hover { background: #eef2f7; color: #032D60; }
+.persona-list-btn.active { background: #e8f0fa; color: #032D60; border-left-color: #0176D3; font-weight: 700; }
+.persona-detail-panel { padding: 32px; background: #fff; overflow-y: auto; }

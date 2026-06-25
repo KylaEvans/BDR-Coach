@@ -650,3 +650,75 @@ document.getElementById('compete-back-btn')?.addEventListener('click', () => {
   document.getElementById('compete-grid').classList.remove('hidden');
   document.getElementById('compete-detail').classList.add('hidden');
 });
+
+// ── PERSONAS TAB ─────────────────────────────────────────────────────────────
+
+const PERSONA_LABELS = {
+  state_cio_persona: 'Chief Information Officer — NSW State Agency',
+  state_cdo: 'Chief Digital Officer — NSW State Agency',
+  state_director_digital: 'Director of Digital Transformation — NSW State Agency',
+  state_service_delivery: 'Director of Service Delivery — NSW State Agency',
+  state_procurement: 'ICT Procurement Manager — NSW State Agency',
+  state_program_director: 'Program Director — NSW State Agency',
+  state_architect: 'Enterprise Architect — NSW State Agency',
+  council_ceo: 'CEO / General Manager — Local Council',
+  council_planning_dir: 'Director of Planning & Environment — Local Council',
+  council_cx: 'Director of Customer Experience — Local Council',
+  council_it_mgr: 'IT Manager — Local Council',
+  council_corporate: 'Director of Corporate Services — Local Council',
+  council_da_mgr: 'Manager of Development Assessment — Local Council',
+};
+
+let loadedPersonas = {};
+
+document.querySelectorAll('.persona-list-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.persona-list-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const personaId = btn.dataset.persona;
+    const label = PERSONA_LABELS[personaId] || personaId;
+    const panel = document.getElementById('persona-detail-panel');
+
+    if (loadedPersonas[personaId]) {
+      panel.innerHTML = loadedPersonas[personaId];
+      return;
+    }
+
+    panel.innerHTML = '<div class="lesson-loading"><div class="spinner"></div><p>Loading persona profile...</p></div>';
+
+    fetch('/api/persona', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ personaId, label }),
+    }).then(res => {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let md = '';
+      panel.innerHTML = '<div class="lesson-body" id="persona-md"></div>';
+      const el = document.getElementById('persona-md');
+
+      function pump() {
+        reader.read().then(({ done, value }) => {
+          if (done) { loadedPersonas[personaId] = panel.innerHTML; return; }
+          const lines = decoder.decode(value).split('\n');
+          lines.forEach(line => {
+            if (line.startsWith('data: ')) {
+              try {
+                const d = JSON.parse(line.slice(6));
+                if (d.text) { md += d.text; el.innerHTML = md.replace(/\n/g, '<br>').replace(/##\s(.+)/g, '<h3>$1</h3>').replace(/###\s(.+)/g, '<h4>$1</h4>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/^- (.+)/gm, '<li>$1</li>').replace(/^> (.+)/gm, '<blockquote>$1</blockquote>'); }
+              } catch {}
+            }
+          });
+          pump();
+        });
+      }
+      pump();
+    });
+  });
+});
+
+// Auto-load first persona
+setTimeout(() => {
+  const firstBtn = document.querySelector('.persona-list-btn');
+  if (firstBtn) firstBtn.click();
+}, 100);

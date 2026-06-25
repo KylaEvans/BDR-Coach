@@ -695,6 +695,57 @@ const LESSONS = [
 
 
 
+
+// POST /api/persona — streaming persona profile
+app.post('/api/persona', async (req, res) => {
+  const { personaId, label } = req.body;
+
+  const systemPrompt = `${STATE_CONTEXT}
+
+You are a world-class government sales coach helping Salesforce BDRs understand who they are calling. You write realistic, practical persona profiles based on genuine understanding of NSW State and Local Government. Your profiles are honest — you acknowledge what motivates these people, what annoys them, and exactly how a BDR should approach them.`;
+
+  sseHeaders(res);
+  await streamToSSE(res, Promise.resolve(client.messages.stream({
+    model: 'claude-opus-4-8',
+    max_tokens: 1800,
+    system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+    messages: [{
+      role: 'user',
+      content: `Give me a complete buyer persona profile for: ${label}
+
+Write this for a Salesforce BDR who has never sold to this type of person before and needs to understand their world before making a cold call.
+
+Structure your response exactly like this:
+
+## ${label}
+
+### What they actually do day-to-day
+Describe a realistic Tuesday for this person. What meetings are they in? What problems land on their desk? What keeps them from leaving on time?
+
+### Their #1 priority right now (FY27 context)
+What is the single most important thing on their plate right now? Reference current NSW government context — AI mandate, housing pressure, DA backlogs, legacy modernisation, cybersecurity requirements, budget cuts, June 30 year-end pressure.
+
+### What they care about in a vendor conversation
+The 3-4 things that make them lean forward. What do they need to hear to stay on the call?
+
+### What makes them hang up or disengage
+Specific things a BDR says or does that immediately loses this person.
+
+### Their common challenges
+5-6 specific pain points relevant to Salesforce solutions — be concrete, not generic.
+
+### How to open the conversation
+A realistic 3-sentence cold call opening that would earn 90 more seconds from this specific person. Use their actual language and reference their real world.
+
+### The best discovery question to ask
+One question that shows genuine industry knowledge and opens up real pain.
+
+### Quick reference
+3-bullet cheat sheet a BDR can scan 30 seconds before dialling.`,
+    }],
+  })));
+});
+
 // POST /api/compete — streaming competitive battle card
 app.post('/api/compete', async (req, res) => {
   const { competitor } = req.body;
@@ -706,7 +757,7 @@ app.post('/api/compete', async (req, res) => {
     civica: 'Civica Authority / Ci Anywhere (council planning, regulatory services, DA workflows, rates)',
     sap: 'SAP (ERP, Finance, HR in large state agencies)',
     oracle: 'Oracle (Finance/ERP in larger government departments)',
-    wakado: 'Wakado (government-specific platform)',
+    workato: 'Workato — iPaaS integration and automation platform (no-code/low-code, competes with MuleSoft for government integration projects, positioned as easier than MuleSoft)',
     legacy: 'Bespoke/Legacy Systems (custom-built citizen portals, aging platforms, "the system we built 15 years ago that nobody can change")',
   };
 

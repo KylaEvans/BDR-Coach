@@ -34,6 +34,9 @@
         <button class="tab-btn" data-tab="compete">
           <span class="tab-icon">⚔️</span> Compete
         </button>
+        <button class="tab-btn" data-tab="personas">
+          <span class="tab-icon">👤</span> Personas
+        </button>
       </nav>
     </div>
   </header>
@@ -542,15 +545,15 @@
         <button class="btn-compete-details" data-competitor="oracle">Battle Card →</button>
       </div>
 
-      <div class="compete-card" data-competitor="wakado">
-        <div class="compete-logo">🟦</div>
+      <div class="compete-card" data-competitor="workato">
+        <div class="compete-logo">🔗</div>
         <div class="compete-info">
-          <strong>Wakado</strong>
-          <span>Government-specific platform</span>
-          <span class="compete-tag compete-tag-medium">Check your territory</span>
+          <strong>Workato</strong>
+          <span>iPaaS · No-code automation · MuleSoft competitor</span>
+          <span class="compete-tag compete-tag-medium">Growing in gov integration</span>
         </div>
-        <div class="compete-where">Modern UX · Agentforce · Data Cloud integration</div>
-        <button class="btn-compete-details" data-competitor="wakado">Battle Card →</button>
+        <div class="compete-where">MuleSoft depth · Agentforce data needs · Gov compliance</div>
+        <button class="btn-compete-details" data-competitor="workato">Battle Card →</button>
       </div>
 
       <div class="compete-card" data-competitor="legacy">
@@ -580,6 +583,42 @@
       </div>
     </div>
 
+  </section>
+
+
+  <\!-- PERSONAS TAB -->
+  <section id="tab-personas" class="tab-pane hidden">
+    <div class="section-intro">
+      <h2>Buyer Persona Guide</h2>
+      <p>Every person you will encounter in NSW State and Local Government. What they do, what they care about, their challenges, and how to open a conversation with them.</p>
+    </div>
+
+    <div class="personas-layout">
+      <div class="personas-sidebar">
+        <div class="persona-group-label">STATE GOVERNMENT</div>
+        <button class="persona-list-btn active" data-persona="state_cio_persona">Chief Information Officer</button>
+        <button class="persona-list-btn" data-persona="state_cdo">Chief Digital Officer</button>
+        <button class="persona-list-btn" data-persona="state_director_digital">Director of Digital Transformation</button>
+        <button class="persona-list-btn" data-persona="state_service_delivery">Director of Service Delivery</button>
+        <button class="persona-list-btn" data-persona="state_procurement">ICT Procurement Manager</button>
+        <button class="persona-list-btn" data-persona="state_program_director">Program Director</button>
+        <button class="persona-list-btn" data-persona="state_architect">Enterprise Architect</button>
+
+        <div class="persona-group-label" style="margin-top:16px;">LOCAL COUNCIL</div>
+        <button class="persona-list-btn" data-persona="council_ceo">CEO / General Manager</button>
+        <button class="persona-list-btn" data-persona="council_planning_dir">Director of Planning</button>
+        <button class="persona-list-btn" data-persona="council_cx">Director of Customer Experience</button>
+        <button class="persona-list-btn" data-persona="council_it_mgr">IT Manager</button>
+        <button class="persona-list-btn" data-persona="council_corporate">Director of Corporate Services</button>
+        <button class="persona-list-btn" data-persona="council_da_mgr">Manager of Development Assessment</button>
+      </div>
+      <div class="persona-detail-panel" id="persona-detail-panel">
+        <div class="lesson-loading">
+          <div class="spinner"></div>
+          <p>Select a persona to load their profile...</p>
+        </div>
+      </div>
+    </div>
   </section>
 
   <script src="app.js"></script>
