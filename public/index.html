@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AusFed BDR Coach</title>
+  <title>State &amp; Local Gov BDR Coach</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,10 +12,10 @@
   <header class="app-header">
     <div class="header-inner">
       <div class="logo">
-        <span class="logo-icon">🏛️</span>
+        <span class="logo-icon">🏢</span>
         <div>
-          <span class="logo-title">AusFed BDR Coach</span>
-          <span class="logo-sub">Salesforce · Australian Federal Government</span>
+          <span class="logo-title">State &amp; Local Gov BDR Coach</span>
+          <span class="logo-sub">Salesforce · NSW State &amp; Local Government</span>
         </div>
       </div>
       <nav class="tab-nav">
@@ -39,7 +39,7 @@
   <section id="tab-roleplay" class="tab-pane active">
     <div class="section-intro">
       <h2>Cold Call Practice</h2>
-      <p>Pick an APS contact and dial in. Claude plays the prospect — your job is to earn a discovery meeting, not pitch a product. Use the Sandler checklist to track your call quality.</p>
+      <p>Pick a State or Council prospect and dial in. Claude plays the prospect — your job is to earn a discovery meeting, not pitch a product. Use the Sandler checklist to track your call quality.</p>
     </div>
 
     <div class="roleplay-layout">
@@ -47,35 +47,45 @@
       <!-- Setup panel -->
       <div class="roleplay-setup" id="roleplay-setup">
         <h3>Choose your prospect</h3>
-        <div class="persona-grid">
+        <div class="persona-grid" style="grid-template-columns:repeat(2,1fr);">
           <label class="persona-card">
-            <input type="radio" name="persona" value="cio" checked />
+            <input type="radio" name="persona" value="state_cio" checked />
             <div class="persona-body">
-              <span class="persona-emoji">💻</span>
-              <strong>Michael Draper</strong>
+              <span class="persona-emoji">🏛️</span>
+              <strong>David Chen</strong>
               <span class="persona-title">Chief Information Officer</span>
-              <span class="persona-org">Dept. of Employment &amp; Workplace</span>
-              <span class="persona-tag direct">Direct &amp; time-poor</span>
+              <span class="persona-org">NSW Dept. of Customer Service</span>
+              <span class="persona-tag direct">AI mandate · $18M budget</span>
             </div>
           </label>
           <label class="persona-card">
-            <input type="radio" name="persona" value="procurement" />
+            <input type="radio" name="persona" value="state_digital" />
             <div class="persona-body">
-              <span class="persona-emoji">📋</span>
-              <strong>Sandra Keane</strong>
-              <span class="persona-title">ICT Procurement Manager</span>
-              <span class="persona-org">Department of Finance</span>
-              <span class="persona-tag process">Process-oriented</span>
+              <span class="persona-emoji">💙</span>
+              <strong>Sarah Okafor</strong>
+              <span class="persona-title">Director of Digital Transformation</span>
+              <span class="persona-org">NSW Health</span>
+              <span class="persona-tag process">Cautious · $8M program</span>
             </div>
           </label>
           <label class="persona-card">
-            <input type="radio" name="persona" value="program" />
+            <input type="radio" name="persona" value="council_planning" />
             <div class="persona-body">
-              <span class="persona-emoji">🚀</span>
-              <strong>Raj Chopra</strong>
-              <span class="persona-title">Program Director</span>
-              <span class="persona-org">Services Australia</span>
-              <span class="persona-tag curious">Curious but cautious</span>
+              <span class="persona-emoji">🏘️</span>
+              <strong>Marcus Webb</strong>
+              <span class="persona-title">Director of Planning &amp; Environment</span>
+              <span class="persona-org">Blacktown City Council</span>
+              <span class="persona-tag curious">Housing mandate · DA backlog</span>
+            </div>
+          </label>
+          <label class="persona-card">
+            <input type="radio" name="persona" value="council_cio" />
+            <div class="persona-body">
+              <span class="persona-emoji">💼</span>
+              <strong>Jenny Tran</strong>
+              <span class="persona-title">IT Manager</span>
+              <span class="persona-org">Inner West Council</span>
+              <span class="persona-tag" style="background:#f0f0f0;color:#666;">No budget · real pain</span>
             </div>
           </label>
         </div>
@@ -84,7 +94,7 @@
           <h4>💡 Before you dial — your goal</h4>
           <ul>
             <li>Your job is to qualify and book a meeting — not pitch, not demo</li>
-            <li>Lead with curiosity about their agency and programs, not Salesforce features</li>
+            <li>Lead with curiosity about their council or agency challenges — DA backlogs, legacy systems, citizen services — not Salesforce features</li>
             <li>Get permission to ask one question — earn each next step</li>
             <li>If you freeze, say what you'd actually say out loud in real life</li>
           </ul>
@@ -192,35 +202,45 @@
       <!-- Setup panel -->
       <div class="discovery-setup" id="discovery-setup">
         <h3>Choose your discovery prospect</h3>
-        <div class="persona-grid">
+        <div class="persona-grid" style="grid-template-columns:repeat(2,1fr);">
           <label class="persona-card">
-            <input type="radio" name="disc-persona" value="cio" checked />
+            <input type="radio" name="disc-persona" value="state_cio" checked />
             <div class="persona-body">
-              <span class="persona-emoji">💻</span>
-              <strong>Michael Draper</strong>
-              <span class="persona-title">CIO — Grant Management Modernisation</span>
-              <span class="persona-org">Dept. of Employment &amp; Workplace</span>
-              <span class="persona-tag direct">$28M FY27 program</span>
+              <span class="persona-emoji">🏛️</span>
+              <strong>David Chen</strong>
+              <span class="persona-title">CIO — ServiceNSW Modernisation</span>
+              <span class="persona-org">NSW Dept. of Customer Service</span>
+              <span class="persona-tag direct">$18M · AI mandate</span>
             </div>
           </label>
           <label class="persona-card">
-            <input type="radio" name="disc-persona" value="procurement" />
+            <input type="radio" name="disc-persona" value="state_digital" />
             <div class="persona-body">
-              <span class="persona-emoji">📋</span>
-              <strong>Sandra Keane</strong>
-              <span class="persona-title">Procurement — WofG Panel Adviser</span>
-              <span class="persona-org">Department of Finance</span>
-              <span class="persona-tag process">Knows every pathway</span>
+              <span class="persona-emoji">💙</span>
+              <strong>Sarah Okafor</strong>
+              <span class="persona-title">Director — Patient Digital Services</span>
+              <span class="persona-org">NSW Health</span>
+              <span class="persona-tag process">$8M federal funding · data sovereignty</span>
             </div>
           </label>
           <label class="persona-card">
-            <input type="radio" name="disc-persona" value="program" />
+            <input type="radio" name="disc-persona" value="council_planning" />
             <div class="persona-body">
-              <span class="persona-emoji">🚀</span>
-              <strong>Raj Chopra</strong>
-              <span class="persona-title">Program Director — Digital First</span>
-              <span class="persona-org">Services Australia</span>
-              <span class="persona-tag curious">$12M confirmed · 30% call centre KPI</span>
+              <span class="persona-emoji">🏘️</span>
+              <strong>Marcus Webb</strong>
+              <span class="persona-title">Director — Planning &amp; Environment</span>
+              <span class="persona-org">Blacktown City Council</span>
+              <span class="persona-tag curious">1,400 DA backlog · housing mandate</span>
+            </div>
+          </label>
+          <label class="persona-card">
+            <input type="radio" name="disc-persona" value="council_cio" />
+            <div class="persona-body">
+              <span class="persona-emoji">💼</span>
+              <strong>Jenny Tran</strong>
+              <span class="persona-title">IT Manager — Digital Services</span>
+              <span class="persona-org">Inner West Council</span>
+              <span class="persona-tag" style="background:#f0f0f0;color:#666;">Resident complaints · Microsoft entrenched</span>
             </div>
           </label>
         </div>
@@ -360,7 +380,7 @@
   <section id="tab-lessons" class="tab-pane hidden">
     <div class="section-intro">
       <h2>Coaching Lessons</h2>
-      <p>Eight focused lessons covering phone confidence, AusFed context, MEDDIC, Sandler, and objection handling. Each delivers exact scripts you can use on your next call.</p>
+      <p>Focused lessons covering phone confidence, State &amp; Local Gov context, MEDDIC, Sandler, the Venn diagram problem, and quality pipeline. Each delivers exact scripts for government conversations.</p>
     </div>
 
     <div class="lessons-layout">
@@ -387,7 +407,7 @@
   <section id="tab-drills" class="tab-pane hidden">
     <div class="section-intro">
       <h2>Objection Handling Drills</h2>
-      <p>An APS officer throws an objection — you respond. Get instant AI coaching on what worked, what to fix, and a better script you can steal for your next call.</p>
+      <p>A State Gov or Council prospect throws an objection — you respond. Get instant AI coaching on what worked, what to fix, and a better script for your next government call.</p>
     </div>
 
     <div class="drills-layout">
@@ -438,7 +458,7 @@
       <div class="drill-empty" id="drill-empty">
         <div class="empty-icon">⚡</div>
         <h3>Ready to drill?</h3>
-        <p>Hit "New Objection" and respond as you would on a real AusFed cold call. Each drill takes under 2 minutes and builds real muscle memory for government conversations.</p>
+        <p>Hit "New Objection" and respond as you would on a real State or Council cold call. Each drill takes under 2 minutes and builds real muscle memory for government conversations.</p>
       </div>
     </div>
   </section>
