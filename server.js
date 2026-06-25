@@ -409,12 +409,12 @@ app.post('/api/lesson', async (req, res) => {
 
   const systemPrompt = `${AUSFED_CONTEXT}
 
-You are a world-class Salesforce BDR coach specialising in Australian Federal Government prospecting. You coach BDRs who are nervous on the phone, new to public sector selling, and want to develop real MEDDIC and Sandler skills. Your style:
-- Give exact scripts and phrases for AusFed conversations — specific, not generic
-- Acknowledge real fears (sounding scripted, not knowing procurement, getting shut down by gatekeepers)
-- Use realistic AusFed examples: agency names, procurement pathways, DTA context, BuyICT, IRAP
+You are a world-class Salesforce BDR coach specialising in NSW State and Local Government prospecting. You coach BDRs who cover NSW State agencies (Departments, Health, Education, etc.) and Local Councils. Your style:
+- Give exact scripts and phrases for State & Local Gov conversations — specific, not generic
+- Acknowledge real fears (sounding scripted, not knowing procurement, councils saying they have no money, getting shut down by gatekeepers)
+- Use realistic examples: NSW agency names (Service NSW, NSW Health, Blacktown Council, Inner West Council), DA automation, housing pressure, AI mandate, Microsoft vs Salesforce stories
 - Format with clear headers (##), bullet points, and script examples in blockquotes (> "script here")
-- Be warm, direct, and encouraging — like a senior Salesforce Enterprise rep coaching their BDR through it`;
+- Be warm, direct, and encouraging — like a senior Salesforce Public Sector rep coaching their BDR through it`;
 
   sseHeaders(res);
   await streamToSSE(res, Promise.resolve(client.messages.stream({
@@ -425,9 +425,9 @@ You are a world-class Salesforce BDR coach specialising in Australian Federal Go
       role: 'user',
       content: `Teach me: "${lesson.title}"
 
-Context: I'm a Salesforce BDR covering Australian Federal Government accounts. I get nervous before cold calls to senior APS staff (CIOs, Program Directors, Procurement Managers). I'm still learning the AusFed procurement landscape and building my MEDDIC and Sandler skills. My job is to qualify and book discovery meetings for my AE — not close deals.
+Context: I'm a Salesforce BDR covering NSW State and Local Government accounts — state agencies and councils. I get nervous before cold calls to state government CIOs, Directors of Planning, IT Managers at councils. I know councils often say they have no budget, and state agencies are under pressure to deliver AI services fast. I'm building my MEDDIC and Sandler skills and learning the State & Local Gov landscape. My job is to qualify and book discovery meetings for my AE — not close deals.
 
-Give me practical, specific coaching I can use today — exact scripts for AusFed conversations, mindset shifts, and real examples relevant to Salesforce in the federal government space. Cover this lesson thoroughly with takeaways I can apply immediately.`,
+Give me practical, specific coaching I can use today — exact scripts for NSW State and Local Gov conversations (councils, state agencies), mindset shifts for when councils say they have no budget, real examples relevant to Salesforce in the state and local government space. Cover this lesson thoroughly with takeaways I can apply immediately.`,
     }],
   })));
 });
@@ -438,25 +438,25 @@ app.post('/api/drill/new', async (req, res) => {
 
   const difficultyGuide = {
     easy: 'A common, predictable objection with a clear path forward for a prepared BDR.',
-    medium: 'A realistic objection requiring knowledge of AusFed procurement or Salesforce positioning.',
-    hard: 'A tough, layered objection or a dismissive APS officer who is difficult to re-engage.',
+    medium: 'A realistic objection requiring knowledge of State/Local Gov procurement or Salesforce positioning.',
+    hard: 'A tough, layered objection or a skeptical council IT manager or state official who is difficult to re-engage.',
   };
 
   const response = await client.messages.create({
     model: 'claude-opus-4-8',
     max_tokens: 300,
-    system: [{ type: 'text', text: AUSFED_CONTEXT, cache_control: { type: 'ephemeral' } }],
+    system: [{ type: 'text', text: STATE_CONTEXT, cache_control: { type: 'ephemeral' } }],
     messages: [{
       role: 'user',
-      content: `Generate a cold call objection an APS officer would give a Salesforce BDR prospecting Australian Federal Government agencies.
+      content: `Generate a cold call objection a NSW State or Local Government prospect would give a Salesforce BDR.
 
 Difficulty: ${difficulty} — ${difficultyGuide[difficulty]}
 Avoid repeating these: ${used.length ? used.join('; ') : 'none'}
 
-Draw from realistic AusFed objections: Microsoft/ServiceNow incumbent, procurement complexity, BuyICT process, "we use Power Platform", "we'd need to tender", "send me info", "I don't handle vendor conversations", IRAP/data sovereignty concerns, "too many platforms already", budget freeze, etc.
+Draw from realistic State & Local Gov objections: "we have no budget" (councils), "we use Microsoft Teams/Power Platform", "IT handles vendor conversations", "we are tied into existing contracts until June 30", "ServiceNow handles that", "send me some information", "we are not in a buying cycle", "we already have a system", "housing pressures mean we are cutting spend not adding it", "our DA system is fine", "the Minister wants digital but there is no money", data sovereignty concerns, procurement panel restrictions.
 
 Return ONLY valid JSON:
-{"objection": "exact words the APS officer says", "persona": "Job Title at Agency Type", "context": "1-sentence situation context"}`,
+{"objection": "exact words the prospect says", "persona": "Job Title at Organisation Type (Council or State Agency)", "context": "1-sentence situation context"}`,
     }],
   });
 
@@ -474,7 +474,7 @@ app.post('/api/drill/score', async (req, res) => {
 
   const systemPrompt = `${AUSFED_CONTEXT}
 
-You are a direct, practical Salesforce BDR coach giving immediate feedback on objection-handling responses from a BDR prospecting Australian Federal Government accounts. Be honest but encouraging. Where relevant, suggest how the BDR could use Salesforce-specific knowledge (BuyICT, IRAP, Sovereign Cloud, PSS, Agentforce) or better Sandler/MEDDIC technique.
+You are a direct, practical Salesforce BDR coach giving immediate feedback on objection-handling responses from a BDR prospecting NSW State and Local Government accounts (councils and state agencies). Be honest but encouraging. Where relevant, suggest how the BDR could use Salesforce-specific knowledge (PSS, Experience Cloud, Agentforce for citizen services, Service Cloud) or better Sandler/MEDDIC technique. Reference real State & Local Gov context: councils with no budget, DA automation, housing mandate, Microsoft Teams replacement with Slack.
 
 Format feedback EXACTLY like this:
 **Score: X/10** — one-line reason
