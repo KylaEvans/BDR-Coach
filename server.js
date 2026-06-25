@@ -453,6 +453,63 @@ Give me a complete beginner's guide covering:
 7. The "we use Microsoft" and "we have no money" objections — exactly how to respond
 
 Write this like you are explaining it to someone who has only ever sold to banks or retailers. No assumed knowledge. Include exact word-for-word scripts.`;
+        } else if (lesson.id === 'compete_microsoft') {
+          return `Teach me the Salesforce vs Microsoft cheat sheet for NSW State and Local Government selling.
+
+Context: I am a Salesforce BDR. Almost every council and state agency I call runs Microsoft — Teams, SharePoint, Office 365, and many have Power Platform. There is a new 5-year Microsoft Whole-of-Government VSA starting July 2026. BDRs are getting shut down with "we already have Microsoft." I need to know exactly where Salesforce wins, where to concede, and what to say.
+
+Give me a complete competitive cheat sheet covering:
+
+## Where Microsoft is strong (concede this honestly)
+- Internal productivity: Teams, email, calendar, document management — Salesforce does not compete here
+- Basic automation: Power Automate for simple internal workflows
+- The WofG VSA reality — acknowledge it rather than pretend it does not exist
+
+## Where Salesforce wins — and exactly why
+1. Citizen-facing service delivery: PSS vs Power Platform — why complex, multi-party citizen journeys need a purpose-built platform, not a general automation tool
+2. DA approvals and council planning workflows — specific reasons Power Platform struggles at scale and pace-of-policy-change
+3. Grants management — why spreadsheets and SharePoint lists fail and what PSS does differently
+4. AI for government: Agentforce vs Microsoft Copilot — the data residency story, human-in-the-loop, full audit trail, IRAP assessment vs Copilot's limitations in Australian government trials
+5. Experience Cloud: citizen portals vs SharePoint public pages — the engagement and self-service gap
+
+## The exact conversation to have
+What to say when they say: "We have the Microsoft WofG deal"
+What to say when they say: "We use Power Platform for that"
+What to say when they say: "We are getting Copilot"
+
+## The one question that opens the door
+The single best discovery question to ask when a prospect is heavily Microsoft-invested
+
+Include word-for-word scripts for each scenario. Be honest about where Microsoft is genuinely strong — BDRs who pretend Salesforce beats Microsoft at everything lose credibility instantly.`;
+        } else if (lesson.id === 'compete_servicenow') {
+          return `Teach me the Salesforce vs ServiceNow cheat sheet for NSW State and Local Government selling.
+
+Context: I am a Salesforce BDR. State agencies often have ServiceNow for their IT helpdesk. When I bring up case management or citizen services, they sometimes say "we already handle that in ServiceNow." I need to know exactly where Salesforce PSS wins against ServiceNow, where to concede, and what to say.
+
+Give me a complete competitive cheat sheet covering:
+
+## Where ServiceNow is strong (concede this honestly)
+- ITSM: IT helpdesk, incident management, change management — ServiceNow was built for this and does it well
+- Internal workflows: IT asset management, employee self-service for IT issues
+- Enterprises with complex IT operations
+
+## Where Salesforce wins — and exactly why
+1. Citizen-facing service delivery: ServiceNow is ITSM-native — it was built for IT departments helping employees, not agencies helping citizens. The UI, the data model, the workflow logic — all wrong for citizen service delivery at scale.
+2. Grants and licensing management: ServiceNow has no purpose-built grants module. PSS does.
+3. DA approvals for councils: ServiceNow cannot handle the complexity of multi-party planning workflows, condition assessment, referral tracking.
+4. Health and aged care case management: PSS Health Cloud vs ServiceNow for complex clinical and community service journeys
+5. Salesforce Data Cloud + Agentforce: ServiceNow's AI story is limited compared to Agentforce with Australian data residency
+6. Integration: MuleSoft vs ServiceNow Integration Hub — where the Salesforce story is stronger in government legacy environments
+
+## The exact conversation to have
+What to say when they say: "We already have ServiceNow"
+What to say when they say: "ServiceNow handles our case management"
+What to say when they say: "IT manages vendor conversations"
+
+## The one positioning statement that lands
+The single clearest way to explain PSS vs ServiceNow in one sentence that resonates with a state government buyer
+
+Include word-for-word scripts. Be specific about NSW government context — agency names, real use cases, realistic scenarios.`;
         } else {
           return `Teach me: "${lesson.title}"
 
@@ -609,6 +666,18 @@ const LESSONS = [
     title: 'BDR + AE + ECS — Know Your Lane',
     icon: '⭕',
     description: 'The Venn diagram problem: where BDRs operate vs AEs vs ECS. How to prospect without treading on toes or duplicating effort',
+  },
+  {
+    id: 'compete_microsoft',
+    title: 'Salesforce vs Microsoft — The Cheat Sheet',
+    icon: '⚔️',
+    description: 'Every council and state agency runs Microsoft. Here is exactly where Salesforce wins, where Microsoft wins, what to say when they say they have the WofG deal, and the specific conversation to have about Agentforce vs Copilot.',
+  },
+  {
+    id: 'compete_servicenow',
+    title: 'Salesforce vs ServiceNow — The Cheat Sheet',
+    icon: '🛡️',
+    description: 'ServiceNow is entrenched in state IT. Here is exactly where Salesforce PSS beats ServiceNow for citizen service delivery, grants management, and council DA workflows — and what to say when they tell you they already have ServiceNow.',
   },
   {
     id: 'quality_pipeline',
