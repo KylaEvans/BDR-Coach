@@ -593,3 +593,60 @@ async function submitDrillResponse() {
     feedbackBody.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
   }
 }
+
+// ── COMPETE TAB ──────────────────────────────────────────────────────────────
+
+document.querySelectorAll('.btn-compete-details').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const competitor = btn.dataset.competitor;
+    const names = {
+      microsoft: 'Microsoft',
+      servicenow: 'ServiceNow',
+      technologyone: 'Technology One',
+      civica: 'Civica',
+      sap: 'SAP',
+      oracle: 'Oracle',
+      wakado: 'Wakado',
+      legacy: 'Bespoke / Legacy Systems',
+    };
+    document.getElementById('compete-grid').classList.add('hidden');
+    document.getElementById('compete-detail').classList.remove('hidden');
+    document.getElementById('compete-detail-title').textContent = (names[competitor] || competitor) + ' — Battle Card';
+    document.getElementById('compete-detail-body').innerHTML = '<div class="lesson-loading"><div class="spinner"></div><p>Generating battle card...</p></div>';
+
+    fetch('/api/compete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ competitor }),
+    }).then(res => {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let md = '';
+      const body = document.getElementById('compete-detail-body');
+      body.innerHTML = '<div class="lesson-body" id="compete-md"></div>';
+      const el = document.getElementById('compete-md');
+
+      function pump() {
+        reader.read().then(({ done, value }) => {
+          if (done) return;
+          const lines = decoder.decode(value).split('\n');
+          lines.forEach(line => {
+            if (line.startsWith('data: ')) {
+              try {
+                const d = JSON.parse(line.slice(6));
+                if (d.text) { md += d.text; el.innerHTML = md.replace(/\n/g, '<br>').replace(/##\s(.+)/g, '<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/^- (.+)/gm, '<li>$1</li>').replace(/^> (.+)/gm, '<blockquote>$1</blockquote>'); }
+              } catch {}
+            }
+          });
+          pump();
+        });
+      }
+      pump();
+    });
+  });
+});
+
+document.getElementById('compete-back-btn')?.addEventListener('click', () => {
+  document.getElementById('compete-grid').classList.remove('hidden');
+  document.getElementById('compete-detail').classList.add('hidden');
+});

@@ -31,6 +31,9 @@
         <button class="tab-btn" data-tab="drills">
           <span class="tab-icon">⚡</span> Drills
         </button>
+        <button class="tab-btn" data-tab="compete">
+          <span class="tab-icon">⚔️</span> Compete
+        </button>
       </nav>
     </div>
   </header>
@@ -461,6 +464,122 @@
         <p>Hit "New Objection" and respond as you would on a real State or Council cold call. Each drill takes under 2 minutes and builds real muscle memory for government conversations.</p>
       </div>
     </div>
+  </section>
+
+
+  <\!-- COMPETE TAB -->
+  <section id="tab-compete" class="tab-pane hidden">
+    <div class="section-intro">
+      <h2>Competitive Battle Cards</h2>
+      <p>Every competitor you will hit in NSW State and Local Government — where they are strong, where Salesforce wins, and the exact conversation to have. Click any card for AI-generated coaching.</p>
+    </div>
+
+    <div class="compete-grid" id="compete-grid">
+
+      <div class="compete-card" data-competitor="microsoft">
+        <div class="compete-logo">⊞</div>
+        <div class="compete-info">
+          <strong>Microsoft</strong>
+          <span>Teams · Power Platform · Copilot · WofG VSA</span>
+          <span class="compete-tag compete-tag-hard">Everywhere — every org</span>
+        </div>
+        <div class="compete-where">Citizen portals · Agentforce vs Copilot · DA automation</div>
+        <button class="btn-compete-details" data-competitor="microsoft">Battle Card →</button>
+      </div>
+
+      <div class="compete-card" data-competitor="servicenow">
+        <div class="compete-logo">⚙️</div>
+        <div class="compete-info">
+          <strong>ServiceNow</strong>
+          <span>ITSM · State agency IT helpdesks</span>
+          <span class="compete-tag compete-tag-medium">Common in state agencies</span>
+        </div>
+        <div class="compete-where">PSS vs ITSM · Grants · Citizen case management</div>
+        <button class="btn-compete-details" data-competitor="servicenow">Battle Card →</button>
+      </div>
+
+      <div class="compete-card" data-competitor="technologyone">
+        <div class="compete-logo">1️⃣</div>
+        <div class="compete-info">
+          <strong>Technology One</strong>
+          <span>ERP · DA management · Rates · TechOne CX</span>
+          <span class="compete-tag compete-tag-hard">Dominant in AU councils</span>
+        </div>
+        <div class="compete-where">Experience Cloud vs TechOne CX · AI at scale · Modern citizen UX</div>
+        <button class="btn-compete-details" data-competitor="technologyone">Battle Card →</button>
+      </div>
+
+      <div class="compete-card" data-competitor="civica">
+        <div class="compete-logo">🏛️</div>
+        <div class="compete-info">
+          <strong>Civica Authority / Ci Anywhere</strong>
+          <span>Council planning · Regulatory · Rates</span>
+          <span class="compete-tag compete-tag-medium">Strong in planning/regulatory</span>
+        </div>
+        <div class="compete-where">PSS for DA workflows · Agentforce for planning decisions</div>
+        <button class="btn-compete-details" data-competitor="civica">Battle Card →</button>
+      </div>
+
+      <div class="compete-card" data-competitor="sap">
+        <div class="compete-logo">🔷</div>
+        <div class="compete-info">
+          <strong>SAP</strong>
+          <span>ERP · Finance · HR in large state agencies</span>
+          <span class="compete-tag compete-tag-low">Back-office, not citizen-facing</span>
+        </div>
+        <div class="compete-where">PSS for citizen services · MuleSoft for SAP integration</div>
+        <button class="btn-compete-details" data-competitor="sap">Battle Card →</button>
+      </div>
+
+      <div class="compete-card" data-competitor="oracle">
+        <div class="compete-logo">🔴</div>
+        <div class="compete-info">
+          <strong>Oracle</strong>
+          <span>Finance · ERP in larger departments</span>
+          <span class="compete-tag compete-tag-low">Back-office focus</span>
+        </div>
+        <div class="compete-where">MuleSoft integration · Agentforce on top of Oracle data</div>
+        <button class="btn-compete-details" data-competitor="oracle">Battle Card →</button>
+      </div>
+
+      <div class="compete-card" data-competitor="wakado">
+        <div class="compete-logo">🟦</div>
+        <div class="compete-info">
+          <strong>Wakado</strong>
+          <span>Government-specific platform</span>
+          <span class="compete-tag compete-tag-medium">Check your territory</span>
+        </div>
+        <div class="compete-where">Modern UX · Agentforce · Data Cloud integration</div>
+        <button class="btn-compete-details" data-competitor="wakado">Battle Card →</button>
+      </div>
+
+      <div class="compete-card" data-competitor="legacy">
+        <div class="compete-logo">🖥️</div>
+        <div class="compete-info">
+          <strong>Bespoke / Legacy Systems</strong>
+          <span>Custom-built portals · Aging platforms · Inertia</span>
+          <span class="compete-tag compete-tag-hard">The biggest "competitor" is doing nothing</span>
+        </div>
+        <div class="compete-where">TCO argument · Policy change cost · AI readiness</div>
+        <button class="btn-compete-details" data-competitor="legacy">Battle Card →</button>
+      </div>
+
+    </div>
+
+    <\!-- Battle card detail panel -->
+    <div class="compete-detail hidden" id="compete-detail">
+      <div class="analysis-header">
+        <button class="btn-back" id="compete-back-btn">← Back to competitors</button>
+        <h3 id="compete-detail-title">Battle Card</h3>
+      </div>
+      <div class="analysis-body" id="compete-detail-body">
+        <div class="lesson-loading">
+          <div class="spinner"></div>
+          <p>Loading battle card...</p>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <script src="app.js"></script>

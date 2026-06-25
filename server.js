@@ -694,6 +694,65 @@ const LESSONS = [
 ];
 
 
+
+// POST /api/compete — streaming competitive battle card
+app.post('/api/compete', async (req, res) => {
+  const { competitor } = req.body;
+
+  const competitorInfo = {
+    microsoft: 'Microsoft (Teams, Power Platform, Copilot, SharePoint, WofG VSA starting July 2026)',
+    servicenow: 'ServiceNow (ITSM, IT helpdesk, service management)',
+    technologyone: 'Technology One — TechOne (ERP, DA management, Rates, Assets, TechOne CX for citizen engagement). THE dominant platform in Australian local government.',
+    civica: 'Civica Authority / Ci Anywhere (council planning, regulatory services, DA workflows, rates)',
+    sap: 'SAP (ERP, Finance, HR in large state agencies)',
+    oracle: 'Oracle (Finance/ERP in larger government departments)',
+    wakado: 'Wakado (government-specific platform)',
+    legacy: 'Bespoke/Legacy Systems (custom-built citizen portals, aging platforms, "the system we built 15 years ago that nobody can change")',
+  };
+
+  const info = competitorInfo[competitor] || competitor;
+
+  const systemPrompt = `${STATE_CONTEXT}
+
+You are a world-class Salesforce competitive intelligence coach for NSW State and Local Government selling. You give direct, honest, practical competitive guidance. You acknowledge where competitors are genuinely strong — BDRs who pretend Salesforce beats everything lose credibility instantly. Your style: specific, honest, with exact word-for-word scripts.`;
+
+  sseHeaders(res);
+  await streamToSSE(res, Promise.resolve(client.messages.stream({
+    model: 'claude-opus-4-8',
+    max_tokens: 2000,
+    thinking: { type: 'adaptive' },
+    system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+    messages: [{
+      role: 'user',
+      content: `Give me a complete competitive battle card for: ${info}
+
+Context: I am a Salesforce BDR covering NSW State and Local Government. I need to know exactly where this competitor is strong, exactly where Salesforce wins, and the word-for-word conversation to have when a prospect mentions them.
+
+Structure your response exactly like this:
+
+## ${info} — Battle Card
+
+### Where they are strong (be honest)
+- Specific things they genuinely do well — do not downplay
+
+### Where Salesforce wins in State & Local Gov
+For each win area, explain WHY specifically, not just what. Reference NSW-specific context (DA automation, housing pressure, citizen portals, Agentforce vs their AI story, data residency).
+
+### The conversation to have
+**When they say:** "[specific objection they raise]"
+**You say:** "exact word-for-word response"
+
+Include 3-4 specific objection/response pairs.
+
+### The one question that opens the door
+A single discovery question that exposes their weakness without attacking them directly.
+
+### Quick reference card
+A 5-bullet summary a BDR can scan before a call.`,
+    }],
+  })));
+});
+
 // ─── Start server ─────────────────────────────────────────────────────────────
 
 const PORT = process.env.PORT || 3001;
