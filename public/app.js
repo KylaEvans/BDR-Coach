@@ -606,7 +606,9 @@ document.querySelectorAll('.btn-compete-details').forEach(btn => {
       civica: 'Civica',
       sap: 'SAP',
       oracle: 'Oracle',
-      wakado: 'Wakado',
+      slack_teams: 'Slack vs Microsoft Teams',
+    workato: 'Workato',
+    wakado: 'Wakado',
       legacy: 'Bespoke / Legacy Systems',
     };
     document.getElementById('compete-grid').classList.add('hidden');
@@ -634,7 +636,16 @@ document.querySelectorAll('.btn-compete-details').forEach(btn => {
             if (line.startsWith('data: ')) {
               try {
                 const d = JSON.parse(line.slice(6));
-                if (d.text) { md += d.text; el.innerHTML = md.replace(/\n/g, '<br>').replace(/##\s(.+)/g, '<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/^- (.+)/gm, '<li>$1</li>').replace(/^> (.+)/gm, '<blockquote>$1</blockquote>'); }
+                if (d.text) { md += d.text; el.innerHTML = md
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+  .replace(/^#### (.+)/gm,'<h5 style="color:#032D60;margin:12px 0 4px">$1</h5>')
+  .replace(/^### (.+)/gm,'<h4 style="color:#032D60;margin:16px 0 6px">$1</h4>')
+  .replace(/^## (.+)/gm,'<h3 style="color:#032D60;margin:20px 0 8px;font-size:18px">$1</h3>')
+  .replace(/^> (.+)/gm,'<blockquote style="border-left:3px solid #0176D3;padding:8px 12px;margin:8px 0;color:#444;font-style:italic">$1</blockquote>')
+  .replace(/^- (.+)/gm,'<li style="margin:4px 0;padding-left:4px">$1</li>')
+  .replace(/---/g,'<hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0">')
+  .replace(/\n/g,'<br>'); }
               } catch {}
             }
           });
@@ -705,7 +716,18 @@ document.querySelectorAll('.persona-list-btn').forEach(btn => {
             if (line.startsWith('data: ')) {
               try {
                 const d = JSON.parse(line.slice(6));
-                if (d.text) { md += d.text; el.innerHTML = md.replace(/\n/g, '<br>').replace(/##\s(.+)/g, '<h3>$1</h3>').replace(/###\s(.+)/g, '<h4>$1</h4>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/^- (.+)/gm, '<li>$1</li>').replace(/^> (.+)/gm, '<blockquote>$1</blockquote>'); }
+                if (d.text) { md += d.text; el.innerHTML = md
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/&lt;strong&gt;(.+?)&lt;\/strong&gt;/g,'<strong>$1</strong>')
+  .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+  .replace(/^#### (.+)/gm,'<h5 style="color:#032D60;margin:12px 0 4px">$1</h5>')
+  .replace(/^### (.+)/gm,'<h4 style="color:#032D60;margin:16px 0 6px">$1</h4>')
+  .replace(/^## (.+)/gm,'<h3 style="color:#032D60;margin:20px 0 8px;font-size:18px">$1</h3>')
+  .replace(/^> (.+)/gm,'<blockquote style="border-left:3px solid #0176D3;padding:8px 12px;margin:8px 0;color:#444;font-style:italic">$1</blockquote>')
+  .replace(/^- (.+)/gm,'<li style="margin:4px 0;padding-left:4px">$1</li>')
+  .replace(/^\*(.+)/gm,'<li style="margin:4px 0;padding-left:4px">$1</li>')
+  .replace(/---/g,'<hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0">')
+  .replace(/\n/g,'<br>'); }
               } catch {}
             }
           });

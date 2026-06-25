@@ -513,7 +513,7 @@ Include word-for-word scripts. Be specific about NSW government context — agen
         } else if (lesson.id === 'slack_agentforce') {
           return `Teach me how to sell Slack + Agentforce to NSW State and Local Government accounts that are heavily invested in Microsoft Teams.
 
-Context: I am a Salesforce BDR. Almost every council and state agency I call uses Microsoft Teams for chat and meetings. They have the M365 agreement. My job is not to rip and replace Teams — it is to get Slack in alongside it, starting with a use case that makes Teams look limited. I know there was a recent $20K Slack deal at a council where we showed them Slack could pull together Teams, Agentforce, and Box into one interface.
+Context: I am a Salesforce BDR. Almost every council and state agency I call uses Microsoft Teams for chat and meetings. They have the M365 agreement. My job is not to rip and replace Teams — it is to get Slack in alongside it, starting with a use case that makes Teams look limited. I know there was a recent $20K Slack deal in a Nonprofit organisation where we showed them Slack could pull together Teams, Agentforce, and Box into one interface. This story is also relevant for councils who face the same Microsoft entrenchment.
 
 Give me a complete lesson covering:
 
@@ -802,7 +802,7 @@ app.post('/api/compete', async (req, res) => {
     civica: 'Civica Authority / Ci Anywhere (council planning, regulatory services, DA workflows, rates)',
     sap: 'SAP (ERP, Finance, HR in large state agencies)',
     oracle: 'Oracle (Finance/ERP in larger government departments)',
-    slack_teams: 'Slack vs Microsoft Teams — Slack as the Agentforce automation layer, Teams for video. The $20K council deal story: BDR showed how Slack pulls together Teams, Agentforce, and Box into one AI-powered interface. Slack Connect for cross-agency collaboration. Agentforce + Slack for DA notifications, service request routing, approval workflows.',
+    slack_teams: 'Slack vs Microsoft Teams — Slack as the Agentforce automation layer, Teams for video. The $20K NFP deal story (also relevant for councils): BDR showed how Slack pulls together Teams, Agentforce, and Box into one AI-powered interface. Slack Connect for cross-agency collaboration. Agentforce + Slack for DA notifications, service request routing, approval workflows.',
     workato: 'Workato — iPaaS integration and automation platform (no-code/low-code, competes with MuleSoft for government integration projects, positioned as easier than MuleSoft)',
     legacy: 'Bespoke/Legacy Systems (custom-built citizen portals, aging platforms, "the system we built 15 years ago that nobody can change")',
   };
