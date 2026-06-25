@@ -510,6 +510,45 @@ What to say when they say: "IT manages vendor conversations"
 The single clearest way to explain PSS vs ServiceNow in one sentence that resonates with a state government buyer
 
 Include word-for-word scripts. Be specific about NSW government context — agency names, real use cases, realistic scenarios.`;
+        } else if (lesson.id === 'slack_agentforce') {
+          return `Teach me how to sell Slack + Agentforce to NSW State and Local Government accounts that are heavily invested in Microsoft Teams.
+
+Context: I am a Salesforce BDR. Almost every council and state agency I call uses Microsoft Teams for chat and meetings. They have the M365 agreement. My job is not to rip and replace Teams — it is to get Slack in alongside it, starting with a use case that makes Teams look limited. I know there was a recent $20K Slack deal at a council where we showed them Slack could pull together Teams, Agentforce, and Box into one interface.
+
+Give me a complete lesson covering:
+
+## Why Slack wins even when they have Teams
+
+### The core story: Slack is the automation layer, Teams is just messaging
+Explain why this distinction matters for government — Teams is great for video calls, but Slack is where AI agents live and work.
+
+### The Agentforce + Slack use cases for State Government
+Give me 3-4 specific, realistic use cases:
+- How a state agency could use Slack + Agentforce for citizen service request routing
+- How approval workflows, notifications, and escalations work in Slack
+- How Slack Connect enables secure cross-agency collaboration (something Teams cannot match)
+- AI-driven triage and automation triggered directly from Slack
+
+### The Agentforce + Slack use cases for Local Council
+Give me 3-4 specific, realistic use cases:
+- DA approval status notifications in Slack — planning team gets real-time updates
+- Agentforce in Slack for resident request routing and triage
+- Cross-department collaboration on planning decisions
+- Replacing long email chains with Slack channels for council working groups
+
+### The Microsoft Teams conversation
+What to say when they say "we already have Teams"
+The exact response that opens the door without attacking Microsoft
+The question that makes them realise Teams cannot do what you are describing
+
+### The "20K door-opener" approach
+How to start small: one Slack use case, one team, one quick win — then expand
+The conversation that gets you the first 180 licenses
+
+### Quick reference
+5-bullet cheat sheet for pre-call prep when you know they use Teams
+
+Include word-for-word scripts. Be specific about council and state agency contexts.`;
         } else {
           return `Teach me: "${lesson.title}"
 
@@ -668,6 +707,12 @@ const LESSONS = [
     description: 'The Venn diagram problem: where BDRs operate vs AEs vs ECS. How to prospect without treading on toes or duplicating effort',
   },
   {
+    id: 'slack_agentforce',
+    title: 'Slack + Agentforce — The Government Story',
+    icon: '💬',
+    description: 'Every council and state agency uses Microsoft Teams. Here is the Slack story that wins anyway — AI-powered workflows, Agentforce in Slack, and why government teams who try Slack do not go back to Teams.',
+  },
+  {
     id: 'compete_microsoft',
     title: 'Salesforce vs Microsoft — The Cheat Sheet',
     icon: '⚔️',
@@ -751,12 +796,13 @@ app.post('/api/compete', async (req, res) => {
   const { competitor } = req.body;
 
   const competitorInfo = {
-    microsoft: 'Microsoft (Teams, Power Platform, Copilot, SharePoint, WofG VSA starting July 2026)',
+    microsoft: 'Microsoft (Teams, Power Platform, Copilot, SharePoint, WofG VSA starting July 2026). KEY: Teams vs Slack + Agentforce is a major differentiated conversation — councils are replacing Teams workflows with Slack + Agentforce for AI automation.',
     servicenow: 'ServiceNow (ITSM, IT helpdesk, service management)',
     technologyone: 'Technology One — TechOne (ERP, DA management, Rates, Assets, TechOne CX for citizen engagement). THE dominant platform in Australian local government.',
     civica: 'Civica Authority / Ci Anywhere (council planning, regulatory services, DA workflows, rates)',
     sap: 'SAP (ERP, Finance, HR in large state agencies)',
     oracle: 'Oracle (Finance/ERP in larger government departments)',
+    slack_teams: 'Slack vs Microsoft Teams — Slack as the Agentforce automation layer, Teams for video. The $20K council deal story: BDR showed how Slack pulls together Teams, Agentforce, and Box into one AI-powered interface. Slack Connect for cross-agency collaboration. Agentforce + Slack for DA notifications, service request routing, approval workflows.',
     workato: 'Workato — iPaaS integration and automation platform (no-code/low-code, competes with MuleSoft for government integration projects, positioned as easier than MuleSoft)',
     legacy: 'Bespoke/Legacy Systems (custom-built citizen portals, aging platforms, "the system we built 15 years ago that nobody can change")',
   };
