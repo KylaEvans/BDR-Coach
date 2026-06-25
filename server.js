@@ -423,11 +423,44 @@ You are a world-class Salesforce BDR coach specialising in NSW State and Local G
     system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
     messages: [{
       role: 'user',
-      content: `Teach me: "${lesson.title}"
+      content: (() => {
+        if (lesson.id === 'state_dummies') {
+          return `Teach me "State Government for Dummies" — I have never sold to state government before and need a complete beginner's guide.
 
-Context: I'm a Salesforce BDR covering NSW State and Local Government accounts — state agencies and councils. I get nervous before cold calls to state government CIOs, Directors of Planning, IT Managers at councils. I know councils often say they have no budget, and state agencies are under pressure to deliver AI services fast. I'm building my MEDDIC and Sandler skills and learning the State & Local Gov landscape. My job is to qualify and book discovery meetings for my AE — not close deals.
+Context: I am a Salesforce BDR. I have sold to commercial companies but never to state government. I do not know what agencies are, how they buy, who the right people are, or what they care about. I am about to start prospecting NSW state agencies.
 
-Give me practical, specific coaching I can use today — exact scripts for NSW State and Local Gov conversations (councils, state agencies), mindset shifts for when councils say they have no budget, real examples relevant to Salesforce in the state and local government space. Cover this lesson thoroughly with takeaways I can apply immediately.`,
+Give me a complete beginner's guide covering:
+1. What is state government — how it is structured, who the buyers are, what they do day-to-day
+2. How state government buys technology — procurement rules, panels, direct sourcing thresholds, June 30 year-end
+3. What keeps a state CIO or Director up at night right now — AI mandate, legacy systems, cybersecurity, citizen services
+4. How Salesforce fits — PSS, Service Cloud, Experience Cloud, Agentforce for government — in plain English
+5. Your first 3 calls — who to call, what to say, how to open without sounding like a vendor
+6. The 3 biggest mistakes BDRs make when they first sell to state gov — and how to avoid them
+
+Write this like you are explaining it to a smart person who knows nothing about government. No jargon without explanation. Include exact word-for-word scripts they can use on their first calls.`;
+        } else if (lesson.id === 'council_dummies') {
+          return `Teach me "Local Council for Dummies" — I have never sold to a local council before and need a complete beginner's guide.
+
+Context: I am a Salesforce BDR. I am about to start prospecting NSW local councils. I genuinely do not know what a council does, who works there, how they spend money, or why they would buy Salesforce. I know they apparently "have no money" but I do not know what that means in practice.
+
+Give me a complete beginner's guide covering:
+1. What a local council actually is — what they do, who the employees are, what they are responsible for (DA approvals, rates, parks, waste, citizen services)
+2. Why councils "have no money" — what this really means and how to handle it without giving up
+3. The housing crisis opportunity — what DA automation means, why councils NEED to fix this, how Salesforce helps
+4. Who to call — Director of Planning, IT Manager, CEO — their day-to-day reality and what they care about
+5. How councils buy technology — LGA procurement rules, panel arrangements, budget cycles, what "no budget" actually means vs "not a priority"
+6. Your first 3 calls — who to call, what to say, how to not sound like a software vendor
+7. The "we use Microsoft" and "we have no money" objections — exactly how to respond
+
+Write this like you are explaining it to someone who has only ever sold to banks or retailers. No assumed knowledge. Include exact word-for-word scripts.`;
+        } else {
+          return `Teach me: "${lesson.title}"
+
+Context: I am a Salesforce BDR covering NSW State and Local Government accounts — state agencies and councils. I get nervous before cold calls to state government CIOs, Directors of Planning, IT Managers at councils. I know councils often say they have no budget, and state agencies are under pressure to deliver AI services fast. I am building my MEDDIC and Sandler skills and learning the State & Local Gov landscape. My job is to qualify and book discovery meetings for my AE — not close deals.
+
+Give me practical, specific coaching I can use today — exact scripts for NSW State and Local Gov conversations (councils, state agencies), mindset shifts for when councils say they have no budget, real examples relevant to Salesforce in the state and local government space. Cover this lesson thoroughly with takeaways I can apply immediately.`;
+        }
+      })(),
     }],
   })));
 });
