@@ -242,16 +242,16 @@ function sseWrite(res, data) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
 
-async function streamToSSE(res, streamPromise) {
+async function streamToSSE(res, stream) {
   try {
-    const stream = await streamPromise;
-    for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-        sseWrite(res, { text: event.delta.text });
+    for await (const chunk of stream) {
+      if (chunk.type === 'content_block_delta' && chunk.delta?.type === 'text_delta') {
+        sseWrite(res, { text: chunk.delta.text });
       }
     }
     sseWrite(res, { done: true });
   } catch (err) {
+    console.error('streamToSSE error:', err.message);
     sseWrite(res, { error: err.message });
   } finally {
     res.end();
@@ -268,8 +268,10 @@ app.get('/api/lessons', (_req, res) => {
 
 // POST /api/roleplay — streaming cold call practice
 app.post('/api/roleplay', async (req, res) => {
-  const { messages = [], persona = 'cio', turnCount = 0 } = req.body;
-  const p = PERSONAS[persona];
+  console.log('→ /api/roleplay hit, persona:', req.body?.persona);
+  const { messages = [], persona = 'state_cio', turnCount = 0 } = req.body;
+  const p = STATE_LOCAL_PERSONAS[persona] || PERSONAS[persona];
+  if (!p) { console.error('No persona found for:', persona); return res.status(400).json({ error: 'Unknown persona' }); }
 
   const ctx = p.context || AUSFED_CONTEXT;
   const systemPrompt = `${ctx}
@@ -295,18 +297,18 @@ CURRENT TURN: ${turnCount}`;
     : messages;
 
   sseHeaders(res);
-  await streamToSSE(res, Promise.resolve(client.messages.stream({
+  await streamToSSE(res, client.messages.stream({
     model: 'claude-opus-4-8',
     max_tokens: 400,
     system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
     messages: apiMessages,
-  })));
+  }));
 });
 
 // POST /api/discovery — streaming discovery meeting practice
 app.post('/api/discovery', async (req, res) => {
-  const { messages = [], persona = 'cio', turnCount = 0 } = req.body;
-  const p = PERSONAS[persona];
+  const { messages = [], persona = 'state_cio', turnCount = 0 } = req.body;
+  const p = STATE_LOCAL_PERSONAS[persona] || PERSONAS[persona];
 
   const dCtx = p.context || AUSFED_CONTEXT;
   const systemPrompt = `${dCtx}
@@ -335,25 +337,25 @@ CURRENT TURN: ${turnCount}`;
     : messages;
 
   sseHeaders(res);
-  await streamToSSE(res, Promise.resolve(client.messages.stream({
+  await streamToSSE(res, client.messages.stream({
     model: 'claude-opus-4-8',
     max_tokens: 600,
     system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
     messages: apiMessages,
-  })));
+  }));
 });
 
 // POST /api/discovery/score — MEDDIC analysis of a discovery conversation
 app.post('/api/discovery/score', async (req, res) => {
   const { messages, persona } = req.body;
-  const p = PERSONAS[persona] || PERSONAS.cio;
+  const p = STATE_LOCAL_PERSONAS[persona] || PERSONAS[persona] || STATE_LOCAL_PERSONAS.state_cio;
 
   const conversationText = messages
     .map(m => `${m.role === 'user' ? 'BDR' : p.name}: ${m.content}`)
     .join('\n\n');
 
   sseHeaders(res);
-  await streamToSSE(res, Promise.resolve(client.messages.stream({
+  await streamToSSE(res, client.messages.stream({
     model: 'claude-opus-4-8',
     max_tokens: 2000,
     system: [{ type: 'text', text: `${AUSFED_CONTEXT}\n\nYou are a Salesforce BDR coach with deep expertise in MEDDIC and Sandler selling. Analyze discovery call transcripts and give structured, honest, actionable feedback. Be specific — reference exact quotes from the transcript.`, cache_control: { type: 'ephemeral' } }],
@@ -398,7 +400,7 @@ Use this EXACT format:
 ## Ready to Pass to Your AE?
 [Yes/Partially/No — what you still need before your AE's time is worth it. Be specific about the gaps.]`,
     }],
-  })));
+  }));
 });
 
 // POST /api/lesson — streaming coaching lesson
@@ -409,15 +411,15 @@ app.post('/api/lesson', async (req, res) => {
 
   const systemPrompt = `${AUSFED_CONTEXT}
 
-You are a world-class Salesforce BDR coach specialising in NSW State and Local Government prospecting. You coach BDRs who cover NSW State agencies (Departments, Health, Education, etc.) and Local Councils. Your style:
-- Give exact scripts and phrases for State & Local Gov conversations — specific, not generic
+You are a world-class Salesforce BDR coach specialising in NSW State, Local and Education prospecting. You coach BDRs who cover NSW State agencies (Departments, Health, Education, etc.) and Local Councils. Your style:
+- Give exact scripts and phrases for SLED conversations — specific, not generic
 - Acknowledge real fears (sounding scripted, not knowing procurement, councils saying they have no money, getting shut down by gatekeepers)
 - Use realistic examples: NSW agency names (Service NSW, NSW Health, Blacktown Council, Inner West Council), DA automation, housing pressure, AI mandate, Microsoft vs Salesforce stories
 - Format with clear headers (##), bullet points, and script examples in blockquotes (> "script here")
 - Be warm, direct, and encouraging — like a senior Salesforce Public Sector rep coaching their BDR through it`;
 
   sseHeaders(res);
-  await streamToSSE(res, Promise.resolve(client.messages.stream({
+  await streamToSSE(res, client.messages.stream({
     model: 'claude-opus-4-8',
     max_tokens: 4000,
     system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
@@ -454,7 +456,7 @@ Give me a complete beginner's guide covering:
 
 Write this like you are explaining it to someone who has only ever sold to banks or retailers. No assumed knowledge. Include exact word-for-word scripts.`;
         } else if (lesson.id === 'compete_microsoft') {
-          return `Teach me the Salesforce vs Microsoft cheat sheet for NSW State and Local Government selling.
+          return `Teach me the Salesforce vs Microsoft cheat sheet for NSW State, Local and Education selling.
 
 Context: I am a Salesforce BDR. Almost every council and state agency I call runs Microsoft — Teams, SharePoint, Office 365, and many have Power Platform. There is a new 5-year Microsoft Whole-of-Government VSA starting July 2026. BDRs are getting shut down with "we already have Microsoft." I need to know exactly where Salesforce wins, where to concede, and what to say.
 
@@ -482,7 +484,7 @@ The single best discovery question to ask when a prospect is heavily Microsoft-i
 
 Include word-for-word scripts for each scenario. Be honest about where Microsoft is genuinely strong — BDRs who pretend Salesforce beats Microsoft at everything lose credibility instantly.`;
         } else if (lesson.id === 'compete_servicenow') {
-          return `Teach me the Salesforce vs ServiceNow cheat sheet for NSW State and Local Government selling.
+          return `Teach me the Salesforce vs ServiceNow cheat sheet for NSW State, Local and Education selling.
 
 Context: I am a Salesforce BDR. State agencies often have ServiceNow for their IT helpdesk. When I bring up case management or citizen services, they sometimes say "we already handle that in ServiceNow." I need to know exactly where Salesforce PSS wins against ServiceNow, where to concede, and what to say.
 
@@ -511,7 +513,7 @@ The single clearest way to explain PSS vs ServiceNow in one sentence that resona
 
 Include word-for-word scripts. Be specific about NSW government context — agency names, real use cases, realistic scenarios.`;
         } else if (lesson.id === 'slack_agentforce') {
-          return `Teach me how to sell Slack + Agentforce to NSW State and Local Government accounts that are heavily invested in Microsoft Teams.
+          return `Teach me how to sell Slack + Agentforce to NSW State, Local and Education accounts that are heavily invested in Microsoft Teams.
 
 Context: I am a Salesforce BDR. Almost every council and state agency I call uses Microsoft Teams for chat and meetings. They have the M365 agreement. My job is not to rip and replace Teams — it is to get Slack in alongside it, starting with a use case that makes Teams look limited. I know there was a recent $20K Slack deal in a Nonprofit organisation where we showed them Slack could pull together Teams, Agentforce, and Box into one interface. This story is also relevant for councils who face the same Microsoft entrenchment.
 
@@ -552,13 +554,13 @@ Include word-for-word scripts. Be specific about council and state agency contex
         } else {
           return `Teach me: "${lesson.title}"
 
-Context: I am a Salesforce BDR covering NSW State and Local Government accounts — state agencies and councils. I get nervous before cold calls to state government CIOs, Directors of Planning, IT Managers at councils. I know councils often say they have no budget, and state agencies are under pressure to deliver AI services fast. I am building my MEDDIC and Sandler skills and learning the State & Local Gov landscape. My job is to qualify and book discovery meetings for my AE — not close deals.
+Context: I am a Salesforce BDR covering NSW State, Local and Education accounts — state agencies and councils. I get nervous before cold calls to state government CIOs, Directors of Planning, IT Managers at councils. I know councils often say they have no budget, and state agencies are under pressure to deliver AI services fast. I am building my MEDDIC and Sandler skills and learning the SLED landscape. My job is to qualify and book discovery meetings for my AE — not close deals.
 
-Give me practical, specific coaching I can use today — exact scripts for NSW State and Local Gov conversations (councils, state agencies), mindset shifts for when councils say they have no budget, real examples relevant to Salesforce in the state and local government space. Cover this lesson thoroughly with takeaways I can apply immediately.`;
+Give me practical, specific coaching I can use today — exact scripts for NSW SLED conversations (councils, state agencies), mindset shifts for when councils say they have no budget, real examples relevant to Salesforce in the state and local government space. Cover this lesson thoroughly with takeaways I can apply immediately.`;
         }
       })(),
     }],
-  })));
+  }));
 });
 
 // POST /api/drill/new — generate a fresh AusFed objection
@@ -582,7 +584,7 @@ app.post('/api/drill/new', async (req, res) => {
 Difficulty: ${difficulty} — ${difficultyGuide[difficulty]}
 Avoid repeating these: ${used.length ? used.join('; ') : 'none'}
 
-Draw from realistic State & Local Gov objections: "we have no budget" (councils), "we use Microsoft Teams/Power Platform", "IT handles vendor conversations", "we are tied into existing contracts until June 30", "ServiceNow handles that", "send me some information", "we are not in a buying cycle", "we already have a system", "housing pressures mean we are cutting spend not adding it", "our DA system is fine", "the Minister wants digital but there is no money", data sovereignty concerns, procurement panel restrictions.
+Draw from realistic SLED objections: "we have no budget" (councils), "we use Microsoft Teams/Power Platform", "IT handles vendor conversations", "we are tied into existing contracts until June 30", "ServiceNow handles that", "send me some information", "we are not in a buying cycle", "we already have a system", "housing pressures mean we are cutting spend not adding it", "our DA system is fine", "the Minister wants digital but there is no money", data sovereignty concerns, procurement panel restrictions.
 
 Return ONLY valid JSON:
 {"objection": "exact words the prospect says", "persona": "Job Title at Organisation Type (Council or State Agency)", "context": "1-sentence situation context"}`,
@@ -603,7 +605,7 @@ app.post('/api/drill/score', async (req, res) => {
 
   const systemPrompt = `${AUSFED_CONTEXT}
 
-You are a direct, practical Salesforce BDR coach giving immediate feedback on objection-handling responses from a BDR prospecting NSW State and Local Government accounts (councils and state agencies). Be honest but encouraging. Where relevant, suggest how the BDR could use Salesforce-specific knowledge (PSS, Experience Cloud, Agentforce for citizen services, Service Cloud) or better Sandler/MEDDIC technique. Reference real State & Local Gov context: councils with no budget, DA automation, housing mandate, Microsoft Teams replacement with Slack.
+You are a direct, practical Salesforce BDR coach giving immediate feedback on objection-handling responses from a BDR prospecting NSW State, Local and Education accounts (councils and state agencies). Be honest but encouraging. Where relevant, suggest how the BDR could use Salesforce-specific knowledge (PSS, Experience Cloud, Agentforce for citizen services, Service Cloud) or better Sandler/MEDDIC technique. Reference real SLED context: councils with no budget, DA automation, housing mandate, Microsoft Teams replacement with Slack.
 
 Format feedback EXACTLY like this:
 **Score: X/10** — one-line reason
@@ -621,7 +623,7 @@ Format feedback EXACTLY like this:
 One sentence on the technique that helps with this type of objection.`;
 
   sseHeaders(res);
-  await streamToSSE(res, Promise.resolve(client.messages.stream({
+  await streamToSSE(res, client.messages.stream({
     model: 'claude-opus-4-8',
     max_tokens: 700,
     system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
@@ -634,7 +636,7 @@ BDR RESPONSE: "${userResponse}"
 
 Score and coach this response.`,
     }],
-  })));
+  }));
 });
 
 
@@ -654,7 +656,7 @@ const LESSONS = [
   },
   {
     id: 'landscape',
-    title: 'State & Local Government 101 — NSW Focus',
+    title: 'SLEDernment 101 — NSW Focus',
     icon: '🏛️',
     description: 'Budget cycles, DTA strategy, BuyICT, IRAP — the AusFed context every BDR needs to sound credible on the phone',
   },
@@ -728,7 +730,7 @@ const LESSONS = [
     id: 'quality_pipeline',
     title: 'Quality Pipeline Over Volume',
     icon: '🎯',
-    description: 'Why pumping S2s for KPIs kills AE trust — and what a quality Stage 2 actually looks like in State & Local Gov',
+    description: 'Why pumping S2s for KPIs kills AE trust — and what a quality Stage 2 actually looks like in SLED',
   },
   {
     id: 'handoff',
@@ -747,10 +749,10 @@ app.post('/api/persona', async (req, res) => {
 
   const systemPrompt = `${STATE_CONTEXT}
 
-You are a world-class government sales coach helping Salesforce BDRs understand who they are calling. You write realistic, practical persona profiles based on genuine understanding of NSW State and Local Government. Your profiles are honest — you acknowledge what motivates these people, what annoys them, and exactly how a BDR should approach them.`;
+You are a world-class government sales coach helping Salesforce BDRs understand who they are calling. You write realistic, practical persona profiles based on genuine understanding of NSW State, Local and Education. Your profiles are honest — you acknowledge what motivates these people, what annoys them, and exactly how a BDR should approach them.`;
 
   sseHeaders(res);
-  await streamToSSE(res, Promise.resolve(client.messages.stream({
+  await streamToSSE(res, client.messages.stream({
     model: 'claude-opus-4-8',
     max_tokens: 1800,
     system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
@@ -788,7 +790,7 @@ One question that shows genuine industry knowledge and opens up real pain.
 ### Quick reference
 3-bullet cheat sheet a BDR can scan 30 seconds before dialling.`,
     }],
-  })));
+  }));
 });
 
 // POST /api/compete — streaming competitive battle card
@@ -811,10 +813,10 @@ app.post('/api/compete', async (req, res) => {
 
   const systemPrompt = `${STATE_CONTEXT}
 
-You are a world-class Salesforce competitive intelligence coach for NSW State and Local Government selling. You give direct, honest, practical competitive guidance. You acknowledge where competitors are genuinely strong — BDRs who pretend Salesforce beats everything lose credibility instantly. Your style: specific, honest, with exact word-for-word scripts.`;
+You are a world-class Salesforce competitive intelligence coach for NSW State, Local and Education selling. You give direct, honest, practical competitive guidance. You acknowledge where competitors are genuinely strong — BDRs who pretend Salesforce beats everything lose credibility instantly. Your style: specific, honest, with exact word-for-word scripts.`;
 
   sseHeaders(res);
-  await streamToSSE(res, Promise.resolve(client.messages.stream({
+  await streamToSSE(res, client.messages.stream({
     model: 'claude-opus-4-8',
     max_tokens: 2000,
     thinking: { type: 'adaptive' },
@@ -823,7 +825,7 @@ You are a world-class Salesforce competitive intelligence coach for NSW State an
       role: 'user',
       content: `Give me a complete competitive battle card for: ${info}
 
-Context: I am a Salesforce BDR covering NSW State and Local Government. I need to know exactly where this competitor is strong, exactly where Salesforce wins, and the word-for-word conversation to have when a prospect mentions them.
+Context: I am a Salesforce BDR covering NSW State, Local and Education. I need to know exactly where this competitor is strong, exactly where Salesforce wins, and the word-for-word conversation to have when a prospect mentions them.
 
 Structure your response exactly like this:
 
@@ -832,7 +834,7 @@ Structure your response exactly like this:
 ### Where they are strong (be honest)
 - Specific things they genuinely do well — do not downplay
 
-### Where Salesforce wins in State & Local Gov
+### Where Salesforce wins in SLED
 For each win area, explain WHY specifically, not just what. Reference NSW-specific context (DA automation, housing pressure, citizen portals, Agentforce vs their AI story, data residency).
 
 ### The conversation to have
@@ -847,12 +849,12 @@ A single discovery question that exposes their weakness without attacking them d
 ### Quick reference card
 A 5-bullet summary a BDR can scan before a call.`,
     }],
-  })));
+  }));
 });
 
 // ─── Start server ─────────────────────────────────────────────────────────────
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`\n✅ State & Local Gov BDR Coach running at http://localhost:${PORT}\n`);
+  console.log(`\n✅ SLED BDR Coach running at http://localhost:${PORT}\n`);
 });
