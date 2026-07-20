@@ -551,6 +551,135 @@ The conversation that gets you the first 180 licenses
 5-bullet cheat sheet for pre-call prep when you know they use Teams
 
 Include word-for-word scripts. Be specific about council and state agency contexts.`;
+        } else if (lesson.id === 'irap_buyict') {
+          return `Teach me how to use IRAP and BuyICT as objection-killers in NSW state and local government selling.
+
+Context: I am a Salesforce BDR. Two of the most common objections I face are "we can't put government data in the cloud" and "we'd have to go through a tender process." I've been told IRAP and BuyICT are the answers to both — but I don't fully understand what they are, and I'm not confident using them on a cold call yet.
+
+Give me a complete lesson covering:
+
+## What IRAP actually is — in plain English
+- What the acronym stands for and who runs it (Australian Signals Directorate / ASD)
+- What it means when a platform is "IRAP assessed" — what was checked, to what standard
+- The classification levels: OFFICIAL, OFFICIAL:Sensitive, PROTECTED — what each means for government data
+- Where Salesforce sits: Government Cloud Plus, Hyperforce AU, what data can be stored
+- Why this matters for a BDR: the exact objection it kills and the word-for-word response
+
+## What BuyICT actually is — in plain English
+- What BuyICT is (NSW pre-approved vendor panel) and how it works
+- How normal government procurement works vs BuyICT (timeframes, thresholds)
+- Salesforce's position on the panel
+- The exact objection it kills: "we'd have to go to tender"
+- Word-for-word scripts for using BuyICT in a cold call and a discovery conversation
+
+## How to use both naturally in a conversation
+- How to drop IRAP into a cold call without sounding like you're reading from a fact sheet
+- How to use BuyICT to create urgency and remove a stall
+- The mistake BDRs make when they overclaim on IRAP (don't say "Salesforce is the only IRAP-assessed platform" — that's not accurate)
+- The confident, credible way to reference both without overpromising
+
+## Quick reference cheat sheet
+The 2-sentence version of each concept you can say in a cold call without missing a beat.
+
+Include exact word-for-word scripts. Make the language natural — this needs to sound like a confident BDR, not a compliance document.`;
+
+        } else if (lesson.id === 'da_backlog') {
+          return `Teach me everything I need to know about DA backlogs to cold call NSW local councils confidently.
+
+Context: I am a Salesforce BDR prospecting NSW local councils. I keep hearing about "DA backlogs" as the key pain point. I know a DA is a Development Application but I don't fully understand the process, why the backlog is such a big problem, or how Salesforce actually solves it. I need to be able to open a cold call with this topic and hold a credible 3-minute conversation.
+
+Give me a complete lesson covering:
+
+## What a Development Application (DA) actually is
+- The full process: who lodges it, what happens at council, what they're checking, who approves it
+- Why it matters: the political, financial, and operational consequences of a backlog
+- Real NSW context: housing targets, Minister pressure, community impact
+- The numbers: scale of the problem (backlogs of 1,400+ in some councils)
+
+## Why the backlog exists — and why it's getting worse
+- Staff shortages, manual processes, paper-based workflows
+- Policy change frequency — new environmental rules, housing targets, planning codes
+- How the housing crisis has exploded DA volumes faster than councils can handle
+
+## How Salesforce PSS solves it — specifically
+- Digital intake: residents submit online, not at the counter
+- Automated routing: applications go to the right assessor automatically
+- Case management: track status, conditions, referrals, approvals in one system
+- Citizen portal: residents check their DA status without calling
+- Agentforce: AI handles simple status inquiries so staff don't have to
+- The result: faster processing, less staff time, fewer angry residents calling
+
+## The cold call using DA backlog as the opener
+- How to research a council's DA backlog before calling (where to find the public data)
+- The opening 30 seconds: how to reference the backlog without sounding like a vendor
+- What the Director of Planning / IT Manager cares about vs what the CEO cares about
+- How to transition from "I know you have a DA backlog" to "can I show you how we fixed it for [council name]"
+
+## Proof points and live customers
+- What you can name: Safe Food Queensland (licensing and inspections), Legal Aid QLD (grants management)
+- How to use these as analogies even when speaking to a council
+
+## The objections you'll hit
+- "We have a system" — what to say
+- "We have no budget" — what to say
+- "Planning handles procurement, not IT" — what to say
+- "Send me information" — what to say
+
+Include exact word-for-word cold call scripts. Make them specific to NSW councils — name real councils (Blacktown Council, Inner West Council, City of Parramatta) as examples.`;
+
+        } else if (lesson.id === 'education_territory') {
+          return `Teach me the Education territory for Salesforce SLED selling — universities, TAFE, and schools.
+
+Context: I am a Salesforce BDR who is starting to prospect Education accounts — universities, TAFE colleges, and K-12 schools. I know Phoebe Wilkinson covers this territory but I need to understand it deeply enough to support her and eventually cover it myself. I don't know what problems universities are trying to solve, what systems they use, or how Salesforce fits in.
+
+Give me a complete lesson covering:
+
+## The Education landscape — why it's a growing territory
+- The international student market: why Australian universities are investing in student experience right now
+- Competition from UK, US, and Canadian universities — what Australian universities are doing to win
+- Government policy pressure: TAFE reform, K-12 digital transformation, the SA Department for Education PoC
+- Why Education is one of Glenn's FY27 top priority verticals for ANZ GPS
+
+## Universities — who to call and what they care about
+- The key personas: CIO, Director of Student Experience, Director of Enrolment, VP Strategy
+- What keeps a university CIO up at night: legacy systems, data silos, international student retention, cybersecurity
+- The international student acquisition funnel and where Salesforce fits
+
+## The Salesforce product stack for universities
+- **Education Cloud** — the full student lifecycle CRM. Prospective student tracking → admissions → enrolment → student success → alumni engagement. The core product.
+- **Marketing Cloud** — targeted campaigns in source markets (China, India, Vietnam). Multilingual outreach. Tracks which campaigns convert to enrolments.
+- **Agentforce** — AI-powered student chatbot for 24/7 support. Application status, campus info, enrolment help. University of Melbourne launched Australia's first student-facing AI assistant using this.
+- **Experience Cloud** — the modern student portal: grades, timetables, support requests, enrolment — all in one place.
+- **Data Cloud** — unified student view so advisors can identify at-risk students early and intervene.
+- **MuleSoft** — the integration layer connecting legacy systems to Salesforce without replacing them.
+
+## Banner, VTAC, and legacy SIS — the integration story
+- What SIS (Student Information System) means: the database universities use for student records
+- Banner (Ellucian): what it is, why universities are stuck on it, why they can't rip it out
+- VTAC (Victorian Tertiary Admissions Centre): the admissions system, why universities need to connect to it
+- How MuleSoft Anypoint Platform connects Banner and VTAC to Salesforce Education Cloud without replacing anything
+- The BDR talking point: "You don't have to replace Banner. MuleSoft connects it."
+
+## TAFE — what they need
+- Enrolment management and student support: Education Cloud + PSS
+- Student recruitment: Marketing Cloud
+- TAFE NSW embedding Salesforce micro-credentials — why TAFE is both a customer and a source of future users
+
+## K-12 schools
+- Digital enrolment, IEPs, student transfers: Education Cloud + PSS
+- School counselling, health & safety: Service Cloud
+- SA Department for Education live PoC: Education Cloud + PSS + Experience Cloud + MuleSoft
+
+## ANZ proof point to use
+- University of Melbourne: first student-facing AI assistant in Australian Higher Ed, built with Salesforce Agentforce
+
+## The cold call for a university
+- Who to call first (CIO vs Director of Student Experience vs Admissions)
+- The opening that works: international student competition angle
+- The question that opens the discovery: "How are you differentiating your international student experience from UK and US universities?"
+
+Include exact word-for-word scripts for university, TAFE, and school cold calls. Make them specific and confident — not generic software vendor language.`;
+
         } else {
           return `Teach me: "${lesson.title}"
 
@@ -737,6 +866,24 @@ const LESSONS = [
     title: 'Qualifying and Handing Off to Your AE',
     icon: '🤝',
     description: 'When is an opportunity qualified enough to pass? How to brief your AE so they walk in sharp and ready to close',
+  },
+  {
+    id: 'irap_buyict',
+    title: 'IRAP, BuyICT & The Procurement Conversation',
+    icon: '🔐',
+    description: 'Two of the most powerful objection-killers in government selling. IRAP removes "we can\'t put data in the cloud." BuyICT removes "we\'d have to go to tender." Learn exactly what they mean and how to use them.',
+  },
+  {
+    id: 'da_backlog',
+    title: 'DA Backlog — The Council Cold Call Weapon',
+    icon: '🏗️',
+    description: 'Development Application backlogs are the most publicly visible pain point in NSW local government right now. Every council is a prospect. Learn what a DA is, why the backlog exists, how Salesforce solves it, and the exact cold call to open with.',
+  },
+  {
+    id: 'education_territory',
+    title: 'Education Territory — Universities, TAFE & Schools',
+    icon: '🎓',
+    description: 'International student competition, Banner and VTAC legacy systems, MuleSoft integration stories, and the full Salesforce Education Cloud stack. Everything a BDR needs to sound credible calling a university CIO or Director of Student Experience.',
   },
 ];
 
