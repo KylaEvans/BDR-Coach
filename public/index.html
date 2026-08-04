@@ -1,637 +1,1144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SLED BDR Coach</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State & Local Gov BDR Coach — Demo</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#0F2940;--blue:#0070D2;--cloud:#1589EE;--green:#2E7D32;--grey:#F4F6F9;--text:#16325C;--amber:#C45500;}
+body{font-family:-apple-system,'Segoe UI',sans-serif;background:var(--grey);color:var(--text);min-height:100vh;}
+
+/* NAV */
+.app-nav{background:var(--navy);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-icon{width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.brand h1{color:#fff;font-size:15px;font-weight:700;}
+.brand p{color:rgba(255,255,255,0.5);font-size:12px;}
+.nav-tabs{display:flex;gap:2px;}
+.nav-tab{padding:7px 14px;border-radius:6px;color:rgba(255,255,255,0.6);font-size:12px;font-weight:600;cursor:pointer;border:none;background:none;transition:all 0.2s;white-space:nowrap;}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.1);}
+.nav-tab.active{color:#fff;background:rgba(255,255,255,0.18);}
+
+/* DEMO BANNER */
+.demo-banner{background:linear-gradient(135deg,#1E3A5F,#0070D2);color:#fff;padding:8px 20px;text-align:center;font-size:12px;font-weight:600;letter-spacing:0.3px;}
+
+/* TABS */
+.tab-pane{display:none;padding:28px;max-width:1100px;margin:0 auto;}
+.tab-pane.active{display:block;}
+.page-head{margin-bottom:24px;}
+.page-head h2{font-size:22px;font-weight:700;margin-bottom:6px;}
+.page-head p{font-size:14px;color:#6B7280;max-width:600px;line-height:1.6;}
+
+/* CALL UI */
+.persona-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.persona-card{border:2px solid #e0e5ee;border-radius:10px;padding:16px;cursor:pointer;transition:all 0.2s;background:#fff;}
+.persona-card.selected{border-color:var(--blue);background:#EEF4FF;}
+.persona-card h4{font-size:14px;font-weight:700;margin-bottom:3px;}
+.persona-card .sub{font-size:12px;color:#6B7280;margin-bottom:8px;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-red{background:#FEE2E2;color:#991B1B;} .badge-blue{background:#DBEAFE;color:#1E40AF;} .badge-amber{background:#FEF3C7;color:#92400E;} .badge-green{background:#D1FAE5;color:#065F46;}
+.start-btn{background:var(--blue);color:#fff;border:none;padding:14px 32px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;width:100%;margin-top:8px;}
+.tip-box{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:#166534;line-height:1.6;}
+
+.call-box{background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,0.06);}
+.call-bar{background:var(--navy);padding:12px 20px;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.call-bar .status{display:flex;align-items:center;gap:8px;color:#fff;font-size:14px;font-weight:600;}
+.dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.end-btn{background:#DC2626;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;}
+.prospect-id{text-align:center;color:#fff;}
+.prospect-id strong{font-size:14px;font-weight:700;display:block;}
+.prospect-id span{font-size:11px;opacity:0.6;}
+
+.call-layout{display:grid;grid-template-columns:1fr 260px;}
+.chat-area{padding:20px;min-height:380px;max-height:440px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
+.msg{max-width:82%;}
+.msg.prospect{align-self:flex-start;}.msg.user{align-self:flex-end;}
+.msg-lbl{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.msg.user .msg-lbl{text-align:right;}
+.bubble{padding:11px 15px;border-radius:12px;font-size:13.5px;line-height:1.55;}
+.msg.prospect .bubble{background:#F3F4F6;color:var(--text);border-bottom-left-radius:4px;}
+.msg.user .bubble{background:var(--blue);color:#fff;border-bottom-right-radius:4px;}
+
+.input-area{border-top:1px solid #e0e5ee;padding:14px 18px;display:flex;gap:10px;}
+.input-area input{flex:1;border:1px solid #d1d5db;border-radius:8px;padding:10px 13px;font-size:13px;color:var(--text);}
+.input-area input::placeholder{color:#9CA3AF;}
+.input-area button{background:var(--blue);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
+
+.checklist{border-left:1px solid #e0e5ee;padding:18px;}
+.checklist h3{font-size:13px;font-weight:700;margin-bottom:3px;}
+.checklist .sub{font-size:11px;color:#9CA3AF;margin-bottom:14px;}
+.chk{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #f0f0f0;align-items:flex-start;}
+.chk:last-of-type{border-bottom:none;}
+.chk input{margin-top:2px;width:15px;height:15px;accent-color:var(--blue);}
+.chk strong{font-size:12px;font-weight:700;display:block;margin-bottom:2px;}
+.chk span{font-size:11px;color:#9CA3AF;}
+.chk-count{text-align:center;margin-top:12px;font-size:12px;font-weight:700;color:var(--blue);}
+
+/* MEDDIC */
+.meddic-tracker{border-left:1px solid #e0e5ee;padding:18px;min-height:400px;}
+.meddic-tracker h3{font-size:13px;font-weight:700;margin-bottom:3px;}
+.meddic-tracker .sub{font-size:11px;color:#9CA3AF;margin-bottom:14px;}
+.meddic-item{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f0f0f0;}
+.meddic-item:last-of-type{border-bottom:none;}
+.meddic-letter{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex-shrink:0;color:#fff;}
+.meddic-item .info strong{font-size:12px;font-weight:700;display:block;margin-bottom:2px;}
+.meddic-item .info span{font-size:11px;color:#9CA3AF;}
+.analyze-btn{margin-top:14px;width:100%;background:var(--blue);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
+
+/* TYPING */
+.typing{display:flex;gap:4px;align-items:center;padding:11px 15px;background:#F3F4F6;border-radius:12px;width:fit-content;}
+.typing span{width:6px;height:6px;background:#9CA3AF;border-radius:50%;animation:bounce 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:0.2s;}.typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+
+/* LESSONS */
+.lessons-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.lesson-card{background:#fff;border-radius:12px;padding:20px;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,0.06);transition:all 0.2s;}
+.lesson-card:hover{box-shadow:0 3px 14px rgba(0,0,0,0.12);transform:translateY(-2px);}
+.lesson-icon{font-size:24px;margin-bottom:10px;}
+.lesson-card h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.4;}
+.lesson-card p{font-size:12px;color:#6B7280;line-height:1.5;margin-bottom:10px;}
+.lesson-link{font-size:12px;font-weight:700;color:var(--amber);}
+
+/* LESSON DETAIL */
+.lesson-detail{background:#fff;border-radius:12px;padding:32px;max-width:760px;box-shadow:0 1px 8px rgba(0,0,0,0.06);}
+.back-btn{background:none;border:none;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:20px;padding:0;display:flex;align-items:center;gap:6px;}
+.lesson-detail h2{font-size:22px;font-weight:700;margin-bottom:8px;}
+.lesson-detail .desc{font-size:14px;color:#6B7280;margin-bottom:24px;line-height:1.6;}
+.lesson-section{margin-bottom:20px;}
+.lesson-section h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--grey);}
+.lesson-section p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:10px;}
+.lesson-section ul{padding-left:18px;}
+.lesson-section ul li{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px;}
+.script-box{background:#EEF4FF;border-left:4px solid var(--blue);padding:14px 18px;border-radius:0 8px 8px 0;font-size:13px;color:var(--text);line-height:1.65;font-style:italic;margin-top:10px;}
+.script-box strong{font-style:normal;display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--blue);margin-bottom:5px;}
+
+/* DRILLS */
+.drill-area{background:#fff;border-radius:12px;box-shadow:0 1px 8px rgba(0,0,0,0.06);}
+.drill-setup{padding:28px;}
+.objection-display{background:#FEF3C7;border:1px solid #F59E0B;border-radius:10px;padding:20px;margin-bottom:20px;}
+.objection-display .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#92400E;margin-bottom:8px;}
+.objection-display h3{font-size:17px;font-weight:700;color:#78350F;margin-bottom:4px;}
+.objection-display .persona{font-size:13px;color:#92400E;}
+.drill-input{border:1px solid #d1d5db;border-radius:8px;padding:14px;font-size:14px;width:100%;height:90px;resize:none;color:var(--text);margin-bottom:12px;}
+.drill-submit{background:var(--blue);color:#fff;border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-right:10px;}
+.drill-next{background:#fff;border:2px solid #e0e5ee;color:var(--text);padding:11px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+.feedback-box{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:20px;margin-top:16px;}
+.feedback-box .score{font-size:24px;font-weight:900;color:#166534;margin-bottom:8px;}
+.feedback-box h4{font-size:14px;font-weight:700;color:#166534;margin-bottom:8px;}
+.feedback-box p{font-size:13px;color:#166534;line-height:1.65;}
+.feedback-box .better{margin-top:12px;background:#DCFCE7;border-radius:8px;padding:12px 14px;font-size:13px;color:#14532D;font-style:italic;}
+.feedback-box .better strong{font-style:normal;display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#166534;margin-bottom:4px;}
+
+/* COMPETE */
+.compete-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.compete-card{background:#fff;border-radius:12px;padding:22px;box-shadow:0 1px 6px rgba(0,0,0,0.06);}
+.compete-card h3{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.vs-badge{background:#FEE2E2;color:#991B1B;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;}
+.pitch-badge{background:#E0E7FF;color:#3730A3;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;}
+.compete-card .truth{font-size:12px;color:#6B7280;line-height:1.55;margin-bottom:12px;}
+.talk-track{background:#EEF4FF;border-left:3px solid var(--blue);padding:10px 13px;border-radius:0 6px 6px 0;font-size:12px;color:var(--text);line-height:1.55;font-style:italic;}
+.talk-track strong{font-style:normal;display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--blue);margin-bottom:4px;}
+
+/* PERSONAS */
+.persona-layout{display:grid;grid-template-columns:220px 1fr;gap:0;}
+.persona-sidebar{background:#fff;border-radius:12px 0 0 12px;border-right:1px solid #e0e5ee;padding:20px;}
+.persona-sidebar .section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9CA3AF;margin-bottom:8px;margin-top:16px;}
+.persona-sidebar .section-label:first-of-type{margin-top:0;}
+.persona-sidebar button{width:100%;text-align:left;padding:8px 12px;border-radius:6px;border:none;background:none;font-size:13px;color:var(--text);cursor:pointer;font-weight:500;}
+.persona-sidebar button:hover{background:var(--grey);}
+.persona-sidebar button.active{background:#EEF4FF;color:var(--blue);font-weight:700;}
+.persona-content{background:#fff;border-radius:0 12px 12px 0;padding:28px;}
+.persona-content h2{font-size:20px;font-weight:700;margin-bottom:4px;}
+.persona-content .role{font-size:14px;color:#6B7280;margin-bottom:4px;}
+.persona-content .org{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:20px;}
+.persona-section{margin-bottom:18px;}
+.persona-section h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#9CA3AF;margin-bottom:8px;}
+.persona-section ul{list-style:none;}
+.persona-section ul li{font-size:13px;color:var(--text);padding:5px 0 5px 16px;position:relative;line-height:1.5;}
+.persona-section ul li::before{content:'→';position:absolute;left:0;color:var(--blue);font-size:11px;top:7px;}
+</style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">🏢</span>
+<div class="demo-banner">⚡ DEMO MODE — Full live version at bdr-coach.onrender.com (requires server)</div>
+
+<nav class="app-nav">
+  <div class="brand">
+    <div class="brand-icon">🏛️</div>
+    <div>
+      <h1>State &amp; Local Gov BDR Coach</h1>
+      <p>Salesforce · NSW State &amp; Local Government</p>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('coldcall',this)">📞 Cold Call</button>
+    <button class="nav-tab" onclick="switchTab('discovery',this)">🎯 Discovery</button>
+    <button class="nav-tab" onclick="switchTab('lessons',this)">📚 Lessons</button>
+    <button class="nav-tab" onclick="switchTab('drills',this)">⚡ Drills</button>
+    <button class="nav-tab" onclick="switchTab('compete',this)">✕ Compete</button>
+    <button class="nav-tab" onclick="switchTab('personas',this)">👤 Personas</button>
+    <button class="nav-tab" onclick="switchTab('tracker',this)">📊 Progress</button>
+  </div>
+</nav>
+
+<!-- ── COLD CALL ── -->
+<div id="tab-coldcall" class="tab-pane active">
+  <div class="page-head"><h2>Cold Call Practice</h2><p>Pick a State or Council prospect and dial in. Claude plays the prospect — your job is to earn a discovery meeting, not pitch a product. Use the Sandler checklist to track your call quality.</p></div>
+  <div id="cc-selector">
+    <div style="background:#fff;border-radius:12px;padding:28px;box-shadow:0 1px 8px rgba(0,0,0,0.06);">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Choose your prospect</h3>
+      <div class="persona-grid">
+        <div class="persona-card selected" onclick="selectP(this,'david')"><h4>David Chen</h4><div class="sub">Chief Information Officer · NSW Dept. of Customer Service</div><span class="badge badge-red">AI MANDATE · $18M BUDGET</span></div>
+        <div class="persona-card" onclick="selectP(this,'sarah')"><h4>Sarah Okafor</h4><div class="sub">Director of Digital Transformation · NSW Health</div><span class="badge badge-blue">CAUTIOUS · $8M PROGRAM</span></div>
+        <div class="persona-card" onclick="selectP(this,'marcus')"><h4>Marcus Webb</h4><div class="sub">Director of Planning &amp; Environment · Blacktown City Council</div><span class="badge badge-amber">HOUSING MANDATE · DA BACKLOG</span></div>
+        <div class="persona-card" onclick="selectP(this,'jenny')"><h4>Jenny Tran</h4><div class="sub">IT Manager · Inner West Council</div><span class="badge badge-red">NO BUDGET · REAL PAIN</span></div>
+      </div>
+      <div class="tip-box">💡 <strong>Before you dial — your goal:</strong> Qualify and book a meeting. Lead with curiosity about their challenges. Earn permission to ask one question. If you freeze, say what you'd actually say out loud in real life.</div>
+      <button class="start-btn" onclick="startCall()">📞 Start Cold Call</button>
+    </div>
+  </div>
+  <div id="cc-call" style="display:none;">
+    <div class="call-box">
+      <div class="call-bar">
+        <div class="status"><div class="dot"></div><span>Connected</span></div>
+        <div class="prospect-id"><strong id="cc-name">David Chen</strong><span id="cc-role">CIO · NSW DCS</span></div>
+        <button class="end-btn" onclick="endCall('cc')">End Call</button>
+      </div>
+      <div class="call-layout">
         <div>
-          <span class="logo-title">SLED BDR Coach</span>
-          <span class="logo-sub">Salesforce · Salesforce · State, Local &amp; Education</span>
+          <div class="chat-area" id="cc-messages"></div>
+          <div class="input-area"><input id="cc-input" placeholder="Type what you'd say out loud…" onkeydown="if(event.key==='Enter')sendCC()"><button onclick="sendCC()">Send</button></div>
+        </div>
+        <div class="checklist">
+          <h3>Call Checklist</h3><div class="sub">Tick each as you earn it</div>
+          <div class="chk"><input type="checkbox" onchange="updCC()"><div><strong>Permission granted</strong><span>They agreed to your upfront contract</span></div></div>
+          <div class="chk"><input type="checkbox" onchange="updCC()"><div><strong>Situation understood</strong><span>You know their current state</span></div></div>
+          <div class="chk"><input type="checkbox" onchange="updCC()"><div><strong>Pain surfaced</strong><span>A real challenge was mentioned</span></div></div>
+          <div class="chk"><input type="checkbox" onchange="updCC()"><div><strong>Relevance established</strong><span>They see why Salesforce could help</span></div></div>
+          <div class="chk"><input type="checkbox" onchange="updCC()"><div><strong>Next step committed</strong><span>Meeting booked or agreed to</span></div></div>
+          <div class="chk-count" id="cc-count">0 of 5 steps</div>
         </div>
       </div>
-      <nav class="tab-nav">
-        <button class="tab-btn active" data-tab="roleplay">
-          <span class="tab-icon">📞</span> Cold Call
-        </button>
-        <button class="tab-btn" data-tab="discovery">
-          <span class="tab-icon">🎯</span> Discovery
-        </button>
-        <button class="tab-btn" data-tab="lessons">
-          <span class="tab-icon">📚</span> Lessons
-        </button>
-        <button class="tab-btn" data-tab="drills">
-          <span class="tab-icon">⚡</span> Drills
-        </button>
-        <button class="tab-btn" data-tab="compete">
-          <span class="tab-icon">⚔️</span> Compete
-        </button>
-        <button class="tab-btn" data-tab="personas">
-          <span class="tab-icon">👤</span> Personas
-        </button>
-      </nav>
     </div>
-  </header>
+  </div>
+</div>
 
-  <!-- ═══════════════════════════════════════ COLD CALL TAB ══════ -->
-  <section id="tab-roleplay" class="tab-pane active">
-    <div class="section-intro">
-      <h2>Cold Call Practice</h2>
-      <p>Pick a State or Council prospect and dial in. Claude plays the prospect — your job is to earn a discovery meeting, not pitch a product. Use the Sandler checklist to track your call quality.</p>
+<!-- COLD CALL FEEDBACK PANEL -->
+<div id="cc-feedback" style="display:none;margin-top:20px;" class="tab-pane active" style="padding:0;">
+<div style="background:#fff;border-radius:12px;padding:28px;box-shadow:0 1px 8px rgba(0,0,0,0.06);max-width:1100px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9CA3AF;margin-bottom:4px;">Call Assessment</div>
+      <h3 style="font-size:20px;font-weight:700;color:var(--text);" id="cc-fb-title">Cold Call — David Chen</h3>
     </div>
-
-    <div class="roleplay-layout">
-
-      <!-- Setup panel -->
-      <div class="roleplay-setup" id="roleplay-setup">
-        <h3>Choose your prospect</h3>
-        <div class="persona-grid" style="grid-template-columns:repeat(2,1fr);">
-          <label class="persona-card">
-            <input type="radio" name="persona" value="state_cio" checked />
-            <div class="persona-body">
-              <span class="persona-emoji">🏛️</span>
-              <strong>David Chen</strong>
-              <span class="persona-title">Chief Information Officer</span>
-              <span class="persona-org">NSW Dept. of Customer Service</span>
-              <span class="persona-tag direct">AI mandate · $18M budget</span>
-            </div>
-          </label>
-          <label class="persona-card">
-            <input type="radio" name="persona" value="state_digital" />
-            <div class="persona-body">
-              <span class="persona-emoji">💙</span>
-              <strong>Sarah Okafor</strong>
-              <span class="persona-title">Director of Digital Transformation</span>
-              <span class="persona-org">NSW Health</span>
-              <span class="persona-tag process">Cautious · $8M program</span>
-            </div>
-          </label>
-          <label class="persona-card">
-            <input type="radio" name="persona" value="council_planning" />
-            <div class="persona-body">
-              <span class="persona-emoji">🏘️</span>
-              <strong>Marcus Webb</strong>
-              <span class="persona-title">Director of Planning &amp; Environment</span>
-              <span class="persona-org">Blacktown City Council</span>
-              <span class="persona-tag curious">Housing mandate · DA backlog</span>
-            </div>
-          </label>
-          <label class="persona-card">
-            <input type="radio" name="persona" value="council_cio" />
-            <div class="persona-body">
-              <span class="persona-emoji">💼</span>
-              <strong>Jenny Tran</strong>
-              <span class="persona-title">IT Manager</span>
-              <span class="persona-org">Inner West Council</span>
-              <span class="persona-tag" style="background:#f0f0f0;color:#666;">No budget · real pain</span>
-            </div>
-          </label>
-        </div>
-
-        <div class="call-tips">
-          <h4>💡 Before you dial — your goal</h4>
-          <ul>
-            <li>Your job is to qualify and book a meeting — not pitch, not demo</li>
-            <li>Lead with curiosity about their council or agency challenges — DA backlogs, legacy systems, citizen services — not Salesforce features</li>
-            <li>Get permission to ask one question — earn each next step</li>
-            <li>If you freeze, say what you'd actually say out loud in real life</li>
-          </ul>
-        </div>
-
-        <button class="btn-primary btn-large" id="start-call-btn">
-          📞 Start Cold Call
-        </button>
+    <div style="text-align:center;">
+      <div style="font-size:42px;font-weight:900;color:var(--blue);" id="cc-fb-score">7</div>
+      <div style="font-size:12px;color:#6B7280;font-weight:600;">out of 10</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Sandler Criteria Breakdown</div>
+      <div id="cc-criteria" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Coaching Feedback</div>
+      <div style="background:#F0FDF4;border-radius:10px;padding:16px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">✅ What Worked</div>
+        <p style="font-size:13px;color:#166534;line-height:1.6;" id="cc-fb-good">You opened with a specific, government-relevant hook. You didn't pitch a product — you asked about a challenge. That's exactly right.</p>
       </div>
-
-      <!-- Call area: chat + sandler checklist -->
-      <div class="call-area hidden" id="call-area">
-
-        <!-- Chat -->
-        <div class="roleplay-chat" id="roleplay-chat">
-          <div class="chat-header">
-            <div class="call-status">
-              <span class="call-dot"></span>
-              <span id="call-status-text">Calling…</span>
-            </div>
-            <div class="prospect-info">
-              <span id="chat-prospect-name"></span>
-              <span id="chat-prospect-title"></span>
-            </div>
-            <button class="btn-end-call" id="end-call-btn">End Call</button>
-          </div>
-
-          <div class="chat-messages" id="chat-messages">
-            <div class="chat-hint">The phone is ringing…</div>
-          </div>
-
-          <div class="chat-input-area">
-            <textarea
-              id="chat-input"
-              placeholder="Type what you'd say out loud…"
-              rows="2"
-              disabled
-            ></textarea>
-            <button class="btn-send" id="chat-send-btn" disabled>Send</button>
-          </div>
-
-          <div class="chat-coaching-bar" id="coaching-bar"></div>
-        </div>
-
-        <!-- Sandler Checklist -->
-        <div class="sandler-tracker">
-          <h4>Call Checklist</h4>
-          <p class="tracker-sub">Tick each as you earn it</p>
-          <div class="sandler-items">
-            <label class="sandler-item">
-              <input type="checkbox" data-sandler="permission" />
-              <div class="sandler-body">
-                <strong>Permission granted</strong>
-                <span>They agreed to your upfront contract</span>
-              </div>
-            </label>
-            <label class="sandler-item">
-              <input type="checkbox" data-sandler="situation" />
-              <div class="sandler-body">
-                <strong>Situation understood</strong>
-                <span>You know their current state</span>
-              </div>
-            </label>
-            <label class="sandler-item">
-              <input type="checkbox" data-sandler="pain" />
-              <div class="sandler-body">
-                <strong>Pain surfaced</strong>
-                <span>A real challenge was mentioned</span>
-              </div>
-            </label>
-            <label class="sandler-item">
-              <input type="checkbox" data-sandler="relevance" />
-              <div class="sandler-body">
-                <strong>Relevance established</strong>
-                <span>They see why Salesforce could help</span>
-              </div>
-            </label>
-            <label class="sandler-item">
-              <input type="checkbox" data-sandler="nextstep" />
-              <div class="sandler-body">
-                <strong>Next step committed</strong>
-                <span>Meeting booked or agreed to</span>
-              </div>
-            </label>
-          </div>
-          <div class="tracker-progress" id="sandler-progress">0 of 5 steps</div>
-          <div class="tracker-badge hidden" id="sandler-badge">
-            ✅ Qualified for discovery — brief your AE
-          </div>
-        </div>
-
+      <div style="background:#FEF2F2;border-radius:10px;padding:16px;">
+        <div style="font-size:11px;font-weight:700;color:#991B1B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">⚠️ Work On This</div>
+        <p style="font-size:13px;color:#991B1B;line-height:1.6;" id="cc-fb-improve">You moved to a next step before the prospect had fully committed their pain. Slow down after they mention a challenge — ask one more question before proposing a meeting.</p>
       </div>
     </div>
-  </section>
+  </div>
+  <div style="background:#EEF4FF;border-radius:10px;padding:16px;margin-bottom:20px;">
+    <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">🎯 The One Question You Should Have Asked</div>
+    <p style="font-size:14px;color:var(--text);font-style:italic;" id="cc-fb-question">"Before we wrap — you mentioned the portal is on three systems. What's the biggest headache that causes day-to-day?" — Getting specific on pain before proposing a meeting would have earned stronger commitment.</p>
+  </div>
+  <div style="display:flex;gap:12px;">
+    <button onclick="tryAgain()" style="background:var(--blue);color:#fff;border:none;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Try Again ↺</button>
+    <button onclick="newPersona()" style="background:#fff;border:2px solid #e0e5ee;color:var(--text);padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Different Prospect →</button>
+  </div>
+</div>
+</div>
 
-  <!-- ═══════════════════════════════════════ DISCOVERY TAB ══════ -->
-  <section id="tab-discovery" class="tab-pane hidden">
-    <div class="section-intro">
-      <h2>MEDDIC Discovery Practice</h2>
-      <p>You've booked the meeting — now run the discovery. Your goal: uncover all six MEDDIC elements. When you're done, hit "Analyze Discovery" for AI coaching on your technique.</p>
-    </div>
-
-    <div class="roleplay-layout">
-
-      <!-- Setup panel -->
-      <div class="discovery-setup" id="discovery-setup">
-        <h3>Choose your discovery prospect</h3>
-        <div class="persona-grid" style="grid-template-columns:repeat(2,1fr);">
-          <label class="persona-card">
-            <input type="radio" name="disc-persona" value="state_cio" checked />
-            <div class="persona-body">
-              <span class="persona-emoji">🏛️</span>
-              <strong>David Chen</strong>
-              <span class="persona-title">CIO — ServiceNSW Modernisation</span>
-              <span class="persona-org">NSW Dept. of Customer Service</span>
-              <span class="persona-tag direct">$18M · AI mandate</span>
-            </div>
-          </label>
-          <label class="persona-card">
-            <input type="radio" name="disc-persona" value="state_digital" />
-            <div class="persona-body">
-              <span class="persona-emoji">💙</span>
-              <strong>Sarah Okafor</strong>
-              <span class="persona-title">Director — Patient Digital Services</span>
-              <span class="persona-org">NSW Health</span>
-              <span class="persona-tag process">$8M federal funding · data sovereignty</span>
-            </div>
-          </label>
-          <label class="persona-card">
-            <input type="radio" name="disc-persona" value="council_planning" />
-            <div class="persona-body">
-              <span class="persona-emoji">🏘️</span>
-              <strong>Marcus Webb</strong>
-              <span class="persona-title">Director — Planning &amp; Environment</span>
-              <span class="persona-org">Blacktown City Council</span>
-              <span class="persona-tag curious">1,400 DA backlog · housing mandate</span>
-            </div>
-          </label>
-          <label class="persona-card">
-            <input type="radio" name="disc-persona" value="council_cio" />
-            <div class="persona-body">
-              <span class="persona-emoji">💼</span>
-              <strong>Jenny Tran</strong>
-              <span class="persona-title">IT Manager — Digital Services</span>
-              <span class="persona-org">Inner West Council</span>
-              <span class="persona-tag" style="background:#f0f0f0;color:#666;">Resident complaints · Microsoft entrenched</span>
-            </div>
-          </label>
-        </div>
-
-        <div class="call-tips">
-          <h4>💡 MEDDIC reminder</h4>
-          <ul>
-            <li><strong>M</strong> — Metrics: What does success look like in measurable terms?</li>
-            <li><strong>E</strong> — Economic Buyer: Who controls the budget and signs off?</li>
-            <li><strong>D</strong> — Decision Criteria: What are they evaluating vendors against?</li>
-            <li><strong>D</strong> — Decision Process: What's the procurement path and timeline?</li>
-            <li><strong>I</strong> — Identify Pain: What's the core problem and its consequence?</li>
-            <li><strong>C</strong> — Champion: Who will advocate for you internally?</li>
-          </ul>
-        </div>
-
-        <button class="btn-primary btn-large" id="start-discovery-btn">
-          🎯 Start Discovery Meeting
-        </button>
+<!-- ── DISCOVERY ── -->
+<div id="tab-discovery" class="tab-pane">
+  <div class="page-head"><h2>MEDDIC Discovery Practice</h2><p>You've booked the meeting — now run the discovery. Your goal: uncover all six MEDDIC elements. When you're done, hit "Analyze Discovery" for AI coaching on your technique.</p></div>
+  <div id="disc-selector">
+    <div style="background:#fff;border-radius:12px;padding:28px;box-shadow:0 1px 8px rgba(0,0,0,0.06);">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Choose your discovery prospect</h3>
+      <div class="persona-grid">
+        <div class="persona-card selected" onclick="selectDP(this,'david')"><h4>David Chen</h4><div class="sub">CIO · NSW Dept. of Customer Service</div><span class="badge badge-red">AI MANDATE · $18M BUDGET</span></div>
+        <div class="persona-card" onclick="selectDP(this,'marcus')"><h4>Marcus Webb</h4><div class="sub">Director of Planning · Blacktown City Council</div><span class="badge badge-amber">1,400 DA BACKLOG</span></div>
+        <div class="persona-card" onclick="selectDP(this,'sarah')"><h4>Sarah Okafor</h4><div class="sub">Director of Digital Transformation · NSW Health</div><span class="badge badge-blue">$8M PROGRAM</span></div>
+        <div class="persona-card" onclick="selectDP(this,'jenny')"><h4>Jenny Tran</h4><div class="sub">IT Manager · Inner West Council</div><span class="badge badge-red">NO BUDGET NOW</span></div>
       </div>
-
-      <!-- Discovery call area -->
-      <div class="call-area hidden" id="disc-call-area">
-
-        <!-- Chat -->
-        <div class="roleplay-chat" id="disc-chat">
-          <div class="chat-header">
-            <div class="call-status">
-              <span class="call-dot call-dot-blue"></span>
-              <span id="disc-status-text">Discovery meeting</span>
-            </div>
-            <div class="prospect-info">
-              <span id="disc-prospect-name"></span>
-              <span id="disc-prospect-title"></span>
-            </div>
-            <button class="btn-end-call" id="end-discovery-btn">End Meeting</button>
-          </div>
-
-          <div class="chat-messages" id="disc-messages">
-            <div class="chat-hint">The meeting is starting…</div>
-          </div>
-
-          <div class="chat-input-area">
-            <textarea
-              id="disc-input"
-              placeholder="Ask a discovery question…"
-              rows="2"
-              disabled
-            ></textarea>
-            <button class="btn-send" id="disc-send-btn" disabled>Send</button>
-          </div>
+      <button class="start-btn" onclick="startDisc()">🎯 Start Discovery Meeting</button>
+    </div>
+  </div>
+  <div id="disc-call" style="display:none;">
+    <div class="call-box">
+      <div class="call-bar">
+        <div class="status"><div class="dot" style="background:#60A5FA;"></div><span>Discovery meeting</span></div>
+        <div class="prospect-id"><strong id="disc-name">David Chen</strong><span id="disc-role">CIO · NSW DCS</span></div>
+        <button class="end-btn" onclick="endCall('disc')">End Meeting</button>
+      </div>
+      <div class="call-layout">
+        <div>
+          <div class="chat-area" id="disc-messages"></div>
+          <div class="input-area"><input id="disc-input" placeholder="Ask a discovery question…" onkeydown="if(event.key==='Enter')sendDisc()"><button onclick="sendDisc()">Send</button></div>
         </div>
-
-        <!-- MEDDIC Tracker -->
         <div class="meddic-tracker">
-          <h4>MEDDIC Tracker</h4>
-          <p class="tracker-sub">Tick as you uncover each element</p>
-          <div class="meddic-items">
-            <label class="meddic-item">
-              <input type="checkbox" data-meddic="metrics" />
-              <div class="meddic-letter meddic-m">M</div>
-              <div class="meddic-info">
-                <strong>Metrics</strong>
-                <span>Success in numbers</span>
-              </div>
-            </label>
-            <label class="meddic-item">
-              <input type="checkbox" data-meddic="economic" />
-              <div class="meddic-letter meddic-e">E</div>
-              <div class="meddic-info">
-                <strong>Economic Buyer</strong>
-                <span>Budget owner identified</span>
-              </div>
-            </label>
-            <label class="meddic-item">
-              <input type="checkbox" data-meddic="criteria">
-              <div class="meddic-letter meddic-d">D</div>
-              <div class="meddic-info">
-                <strong>Decision Criteria</strong>
-                <span>What they're evaluating</span>
-              </div>
-            </label>
-            <label class="meddic-item">
-              <input type="checkbox" data-meddic="process" />
-              <div class="meddic-letter meddic-d2">D</div>
-              <div class="meddic-info">
-                <strong>Decision Process</strong>
-                <span>Procurement path &amp; timeline</span>
-              </div>
-            </label>
-            <label class="meddic-item">
-              <input type="checkbox" data-meddic="pain" />
-              <div class="meddic-letter meddic-i">I</div>
-              <div class="meddic-info">
-                <strong>Identify Pain</strong>
-                <span>Core problem &amp; impact</span>
-              </div>
-            </label>
-            <label class="meddic-item">
-              <input type="checkbox" data-meddic="champion" />
-              <div class="meddic-letter meddic-c">C</div>
-              <div class="meddic-info">
-                <strong>Champion</strong>
-                <span>Internal advocate found</span>
-              </div>
-            </label>
-          </div>
-          <div class="tracker-progress" id="meddic-progress">0 of 6 elements</div>
-          <div class="tracker-badge hidden" id="meddic-badge">
-            🎯 Full MEDDIC — ready to analyze
-          </div>
-          <button class="btn-analyze hidden" id="analyze-btn">
-            Analyze Discovery →
-          </button>
-        </div>
-
-      </div>
-
-      <!-- MEDDIC Analysis panel -->
-      <div class="analysis-panel hidden" id="analysis-panel">
-        <div class="analysis-header">
-          <button class="btn-back" id="analysis-back-btn">← New Discovery</button>
-          <h3>MEDDIC Analysis</h3>
-        </div>
-        <div class="analysis-body" id="analysis-body">
-          <div class="lesson-loading">
-            <div class="spinner"></div>
-            <p>Analyzing your discovery…</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════ LESSONS TAB ════════ -->
-  <section id="tab-lessons" class="tab-pane hidden">
-    <div class="section-intro">
-      <h2>Coaching Lessons</h2>
-      <p>Focused lessons covering phone confidence, SLED context, MEDDIC, Sandler, the Venn diagram problem, and quality pipeline. Each delivers exact scripts for government conversations.</p>
-    </div>
-
-    <div class="lessons-layout">
-      <div class="lesson-grid" id="lesson-grid">
-        <!-- Populated by JS -->
-      </div>
-
-      <div class="lesson-content hidden" id="lesson-content">
-        <div class="lesson-content-header">
-          <button class="btn-back" id="lesson-back-btn">← Back to lessons</button>
-          <h3 id="lesson-content-title"></h3>
-        </div>
-        <div class="lesson-body" id="lesson-body">
-          <div class="lesson-loading">
-            <div class="spinner"></div>
-            <p>Loading your lesson…</p>
-          </div>
+          <h3>MEDDIC Tracker</h3><div class="sub">Tick as you uncover each element</div>
+          <div class="meddic-item"><input type="checkbox" style="margin-top:4px;width:14px;height:14px;accent-color:#1E40AF;"><div style="display:flex;align-items:center;gap:8px;"><div class="meddic-letter" style="background:#1E40AF;">M</div><div class="info"><strong>Metrics</strong><span>Success in numbers</span></div></div></div>
+          <div class="meddic-item"><input type="checkbox" style="margin-top:4px;width:14px;height:14px;accent-color:#7C3AED;"><div style="display:flex;align-items:center;gap:8px;"><div class="meddic-letter" style="background:#7C3AED;">E</div><div class="info"><strong>Economic Buyer</strong><span>Budget owner identified</span></div></div></div>
+          <div class="meddic-item"><input type="checkbox" style="margin-top:4px;width:14px;height:14px;accent-color:#C2410C;"><div style="display:flex;align-items:center;gap:8px;"><div class="meddic-letter" style="background:#C2410C;">D</div><div class="info"><strong>Decision Criteria</strong><span>What they're evaluating</span></div></div></div>
+          <div class="meddic-item"><input type="checkbox" style="margin-top:4px;width:14px;height:14px;accent-color:#B91C1C;"><div style="display:flex;align-items:center;gap:8px;"><div class="meddic-letter" style="background:#B91C1C;">D</div><div class="info"><strong>Decision Process</strong><span>Procurement path &amp; timeline</span></div></div></div>
+          <div class="meddic-item"><input type="checkbox" style="margin-top:4px;width:14px;height:14px;accent-color:#166534;"><div style="display:flex;align-items:center;gap:8px;"><div class="meddic-letter" style="background:#166534;">I</div><div class="info"><strong>Identify Pain</strong><span>Core problem &amp; impact</span></div></div></div>
+          <div class="meddic-item"><input type="checkbox" style="margin-top:4px;width:14px;height:14px;accent-color:#0F766E;"><div style="display:flex;align-items:center;gap:8px;"><div class="meddic-letter" style="background:#0F766E;">C</div><div class="info"><strong>Champion</strong><span>Internal advocate found</span></div></div></div>
+          <button class="analyze-btn" onclick="analyzeDisc()">Analyze Discovery →</button>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════ DRILLS TAB ═════════ -->
-  <section id="tab-drills" class="tab-pane hidden">
-    <div class="section-intro">
-      <h2>Objection Handling Drills</h2>
-      <p>A State Gov or Council prospect throws an objection — you respond. Get instant AI coaching on what worked, what to fix, and a better script for your next government call.</p>
+    <div id="disc-analysis" style="display:none;margin-top:20px;background:#fff;border-radius:12px;padding:28px;box-shadow:0 1px 8px rgba(0,0,0,0.06);">
+      <h3 style="font-size:17px;font-weight:700;margin-bottom:16px;">🎯 MEDDIC Coaching Feedback</h3>
+      <div style="background:#EEF4FF;border-radius:10px;padding:18px;margin-bottom:16px;"><div style="font-size:22px;font-weight:900;color:var(--blue);margin-bottom:6px;">7/10 Overall Discovery Score</div><p style="font-size:13px;color:var(--text);line-height:1.6;">Good foundation. You surfaced pain early and established rapport. The gaps are around Economic Buyer identification and Decision Process — you haven't mapped the procurement path.</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div style="background:#F0FDF4;border-radius:8px;padding:14px;"><strong style="font-size:13px;font-weight:700;color:#166534;display:block;margin-bottom:6px;">✅ What Worked</strong><p style="font-size:12px;color:#166534;line-height:1.55;">You opened with a specific reference to their DA backlog — that earned immediate credibility. Pain was surfaced naturally without pitching.</p></div>
+        <div style="background:#FEF2F2;border-radius:8px;padding:14px;"><strong style="font-size:13px;font-weight:700;color:#991B1B;display:block;margin-bottom:6px;">⚠️ Biggest Gaps</strong><p style="font-size:12px;color:#991B1B;line-height:1.55;">You never asked who signs off on budget. You don't know the procurement pathway — BuyICT? Open tender? Timeline to decision?</p></div>
+      </div>
+      <div style="background:#FEF3C7;border-radius:10px;padding:16px;"><strong style="font-size:12px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">Three Questions You Should Have Asked</strong><ol style="padding-left:18px;font-size:13px;color:#78350F;line-height:1.7;"><li>"When this gets approved, who signs the contract — is that you or someone above?" <em>(Economic Buyer)</em></li><li>"Are you on a panel arrangement like BuyICT, or would this go to tender?" <em>(Decision Process)</em></li><li>"If we could reduce your DA processing time by 40% — what does that mean for you personally?" <em>(Metrics)</em></li></ol></div>
     </div>
+  </div>
+</div>
 
-    <div class="drills-layout">
-
-      <div class="drill-controls">
-        <div class="difficulty-select">
-          <span>Difficulty:</span>
-          <button class="diff-btn active" data-diff="easy">Easy</button>
-          <button class="diff-btn" data-diff="medium">Medium</button>
-          <button class="diff-btn" data-diff="hard">Hard</button>
-        </div>
-        <button class="btn-primary" id="new-drill-btn">New Objection →</button>
-      </div>
-
-      <div class="drill-card hidden" id="drill-card">
-        <div class="drill-context" id="drill-context"></div>
-        <div class="drill-persona" id="drill-persona"></div>
-        <div class="drill-objection" id="drill-objection"></div>
-      </div>
-
-      <div class="drill-loading hidden" id="drill-loading">
-        <div class="spinner"></div>
-        <p>Getting your next objection…</p>
-      </div>
-
-      <div class="drill-response-area hidden" id="drill-response-area">
-        <label class="response-label">Your response:</label>
-        <textarea
-          id="drill-response"
-          placeholder="Type how you'd respond to this objection…"
-          rows="4"
-        ></textarea>
-        <div class="response-actions">
-          <button class="btn-hint" id="hint-btn">Show hint</button>
-          <button class="btn-primary" id="submit-response-btn">Get feedback →</button>
-        </div>
-        <div class="drill-hint hidden" id="drill-hint">
-          💡 <strong>Sandler hint:</strong> Don't argue or cave. Acknowledge their reality first ("That makes sense"), then ask a curious question to understand more — never jump straight to positioning.
-        </div>
-      </div>
-
-      <div class="drill-feedback hidden" id="drill-feedback">
-        <h3>Coach's Feedback</h3>
-        <div class="feedback-body" id="feedback-body"></div>
-        <button class="btn-primary" id="next-drill-btn">Next Objection →</button>
-      </div>
-
-      <div class="drill-empty" id="drill-empty">
-        <div class="empty-icon">⚡</div>
-        <h3>Ready to drill?</h3>
-        <p>Hit "New Objection" and respond as you would on a real State or Council cold call. Each drill takes under 2 minutes and builds real muscle memory for government conversations.</p>
-      </div>
+<!-- ── LESSONS ── -->
+<div id="tab-lessons" class="tab-pane">
+  <div id="lessons-list">
+    <div class="page-head"><h2>Coaching Lessons</h2><p>Focused lessons covering phone confidence, State &amp; Local Gov context, MEDDIC, Sandler, the Venn diagram problem, and quality pipeline. Each delivers exact scripts for government conversations.</p></div>
+    <div class="lessons-grid">
+      <div class="lesson-card" onclick="openLesson('mindset')"><div class="lesson-icon">🧠</div><h4>Phone Confidence for BDRs</h4><p>Reframe your role — you're qualifying, not selling. Why that mindset shift makes cold calls far less scary</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('state101')"><div class="lesson-icon">🏛️</div><h4>State &amp; Local Government 101 — NSW Focus</h4><p>Budget cycles, DTA strategy, BuyICT, IRAP — the AusFed context every BDR needs to sound credible on the phone</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('meddic')"><div class="lesson-icon">🎯</div><h4>MEDDIC for Public Sector</h4><p>All six MEDDIC elements adapted for APS — exact discovery questions for each, plus the AusFed-specific traps to avoid</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('sandler')"><div class="lesson-icon">🔍</div><h4>Sandler Techniques That Work in Government</h4><p>Upfront contracts, the pain funnel, and qualification adapted for APS conversations that naturally move slow</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('research')"><div class="lesson-icon">📋</div><h4>Researching Agencies Before You Call</h4><p>Budget Papers, annual reports, LinkedIn, DTA investment data — how to know more about the agency than they expect</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('openers')"><div class="lesson-icon">📞</div><h4>Cold Call Openers That Work in Government</h4><p>The tone, pace, and permission-based openers that earn 90 more seconds from time-poor APS officers</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('objections')"><div class="lesson-icon">🛡️</div><h4>Handling State &amp; Local Objections</h4><p>"We use Microsoft", "procurement takes too long", "send me info" — exactly how to handle the top 8 objections</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('stategov')" style="border-top:3px solid #0176D3;"><div class="lesson-icon">🏛️</div><h4>State Government NSW — SLED BDR Briefing</h4><p>AI mandate FY28, IRAP clearance, BuyICT, contact centre KPIs — everything you need to sound credible before calling a NSW state agency</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('council')" style="border-top:3px solid #DD7A01;"><div class="lesson-icon">🏘️</div><h4>Local Council — SLED BDR Briefing</h4><p>DA backlog, housing mandate, NSW AI Early Adopter Grant, $20K Slack pilot — the ground truth for council prospecting in NSW</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('education')" style="border-top:3px solid #2E844A;"><div class="lesson-icon">🎓</div><h4>Education Territory — Universities, TAFE & Schools</h4><p>International student competition, Education Cloud, Banner/VTAC/MuleSoft integration story — everything for calling a university CIO or Director of Student Experience</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('education_cold_call')" style="border-top:3px solid #2E844A;">
+  <div class="lesson-icon">🎓</div>
+  <h4>Education Territory: Admissions + Student Experience Cold Call</h4>
+  <p>Full cold call script, voicemail, two email templates, QTAC discovery brief, and key intel. MuleSoft overlays Banner/O2 — that opens every door.</p>
+  <div class="lesson-link">Read lesson →</div>
+</div>
+      <div class="lesson-card" onclick="openLesson('nsw_state_gov')" style="border-top:3px solid #032D60;">
+  <div class="lesson-icon">🏛️</div>
+  <h4>NSW State Government: AI Mandate Cold Call</h4>
+  <p>Full cold call script, voicemail, two email templates, and key intel for the NSW AI mandate opportunity. FY28 deadline creates urgency across the entire territory. IRAP is the differentiator.</p>
+  <div class="lesson-link">Read lesson →</div>
+</div>
+      <div class="lesson-card" onclick="openLesson('nsw_council_da')" style="border-top:3px solid #0176D3;">
+  <div class="lesson-icon">🏘️</div>
+  <h4>NSW Council: DA Automation Cold Call</h4>
+  <p>Full cold call script, voicemail, two email templates, and key supporting intel for the NSW DA backlog opportunity. 16 councils already in the AI Early Adopter Grant program.</p>
+  <div class="lesson-link">Read lesson →</div>
+</div>
+      <div class="lesson-card" onclick="openLesson('venn')"><div class="lesson-icon">🔴</div><h4>BDR + AE + ECS — Know Your Lane</h4><p>The Venn diagram problem: where BDRs operate vs AEs vs ECS. How to prospect without treading on toes or duplicating effort</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('slack')"><div class="lesson-icon">💬</div><h4>Slack + Agentforce — The Government Story</h4><p>Every council and state agency uses Microsoft Teams. Here is the Slack story that wins anyway — AI-powered workflows, Agentforce in Slack, and why government teams who try Slack do not go back to Teams.</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('vsmicrosoft')"><div class="lesson-icon">✕</div><h4>Salesforce vs Microsoft — The Cheat Sheet</h4><p>Every council and state agency runs Microsoft. Here is exactly where Salesforce wins, where Microsoft wins, what to say when they say they have the WofG deal</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('vsservicenow')"><div class="lesson-icon">🛡️</div><h4>Salesforce vs ServiceNow — The Cheat Sheet</h4><p>ServiceNow is entrenched in state IT. Here is exactly where Salesforce PSS wins and the exact questions that expose the gap</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('quality')"><div class="lesson-icon">🎯</div><h4>Quality Pipeline Over Volume</h4><p>Why pumping S2s for KPIs kills AE trust — and what a quality Stage 2 actually looks like in State &amp; Local</p><div class="lesson-link">Read lesson →</div></div>
+      <div class="lesson-card" onclick="openLesson('handoff')"><div class="lesson-icon">🤝</div><h4>Qualifying and Handing Off to Your AE</h4><p>When is an opportunity qualified enough to pass? How to brief your AE so they actually trust what you've brought them</p><div class="lesson-link">Read lesson →</div></div>
     </div>
-  </section>
+  </div>
+  <div id="lesson-detail" style="display:none;">
+    <button class="back-btn" onclick="closelesson()">← Back to lessons</button>
+    <div class="lesson-detail" id="lesson-content"></div>
+  </div>
+</div>
 
-
-  <!-- COMPETE TAB -->
-  <section id="tab-compete" class="tab-pane hidden">
-    <div class="section-intro">
-      <h2>Competitive Battle Cards</h2>
-      <p>Every competitor you will hit in NSW State, Local and Education — where they are strong, where Salesforce wins, and the exact conversation to have. Click any card for AI-generated coaching.</p>
-    </div>
-
-    <div class="compete-grid" id="compete-grid">
-
-      <div class="compete-card" style="border-color:#4A154B;">
-        <div class="compete-logo">💬</div>
-        <div class="compete-info">
-          <strong>Slack vs Microsoft Teams</strong>
-          <span>Agentforce in Slack · AI workflows · Connect</span>
-          <span class="compete-tag" style="background:#f0e6ff;color:#4A154B;">Best Salesforce door-opener</span>
-        </div>
-        <div class="compete-where">Agentforce automation · DA notifications · Cross-agency channels</div>
-        <button class="btn-compete-details" data-competitor="slack_teams" style="background:#4A154B;">Battle Card →</button>
+<!-- ── DRILLS ── -->
+<div id="tab-drills" class="tab-pane">
+  <div class="page-head"><h2>Objection Drills</h2><p>Get a new objection, type your response, receive instant coaching feedback. Repeat until objection handling is automatic.</p></div>
+  <div class="drill-area">
+    <div class="drill-setup">
+      <div class="objection-display">
+        <div class="lbl">New objection — <span id="drill-difficulty">Medium difficulty</span></div>
+        <h3 id="drill-objection">"We already have a whole-of-government Microsoft agreement. Everything runs through Teams and Power Platform. I don't see what Salesforce adds."</h3>
+        <div class="persona" id="drill-persona">— IT Manager, NSW State Agency</div>
       </div>
-
-      <div class="compete-card" data-competitor="microsoft">
-        <div class="compete-logo">⊞</div>
-        <div class="compete-info">
-          <strong>Microsoft</strong>
-          <span>Teams · Power Platform · Copilot · WofG VSA</span>
-          <span class="compete-tag compete-tag-hard">Everywhere — every org</span>
-        </div>
-        <div class="compete-where">Citizen portals · Agentforce vs Copilot · DA automation</div>
-        <button class="btn-compete-details" data-competitor="microsoft">Battle Card →</button>
-      </div>
-
-      <div class="compete-card" data-competitor="servicenow">
-        <div class="compete-logo">⚙️</div>
-        <div class="compete-info">
-          <strong>ServiceNow</strong>
-          <span>ITSM · State agency IT helpdesks</span>
-          <span class="compete-tag compete-tag-medium">Common in state agencies</span>
-        </div>
-        <div class="compete-where">PSS vs ITSM · Grants · Citizen case management</div>
-        <button class="btn-compete-details" data-competitor="servicenow">Battle Card →</button>
-      </div>
-
-      <div class="compete-card" data-competitor="technologyone">
-        <div class="compete-logo">1️⃣</div>
-        <div class="compete-info">
-          <strong>Technology One</strong>
-          <span>ERP · DA management · Rates · TechOne CX</span>
-          <span class="compete-tag compete-tag-hard">Dominant in AU councils</span>
-        </div>
-        <div class="compete-where">Experience Cloud vs TechOne CX · AI at scale · Modern citizen UX</div>
-        <button class="btn-compete-details" data-competitor="technologyone">Battle Card →</button>
-      </div>
-
-      <div class="compete-card" data-competitor="civica">
-        <div class="compete-logo">🏛️</div>
-        <div class="compete-info">
-          <strong>Civica Authority / Ci Anywhere</strong>
-          <span>Council planning · Regulatory · Rates</span>
-          <span class="compete-tag compete-tag-medium">Strong in planning/regulatory</span>
-        </div>
-        <div class="compete-where">PSS for DA workflows · Agentforce for planning decisions</div>
-        <button class="btn-compete-details" data-competitor="civica">Battle Card →</button>
-      </div>
-
-      <div class="compete-card" data-competitor="sap">
-        <div class="compete-logo">🔷</div>
-        <div class="compete-info">
-          <strong>SAP</strong>
-          <span>ERP · Finance · HR in large state agencies</span>
-          <span class="compete-tag compete-tag-low">Back-office, not citizen-facing</span>
-        </div>
-        <div class="compete-where">PSS for citizen services · MuleSoft for SAP integration</div>
-        <button class="btn-compete-details" data-competitor="sap">Battle Card →</button>
-      </div>
-
-      <div class="compete-card" data-competitor="oracle">
-        <div class="compete-logo">🔴</div>
-        <div class="compete-info">
-          <strong>Oracle</strong>
-          <span>Finance · ERP in larger departments</span>
-          <span class="compete-tag compete-tag-low">Back-office focus</span>
-        </div>
-        <div class="compete-where">MuleSoft integration · Agentforce on top of Oracle data</div>
-        <button class="btn-compete-details" data-competitor="oracle">Battle Card →</button>
-      </div>
-
-      <div class="compete-card" data-competitor="workato">
-        <div class="compete-logo">🔗</div>
-        <div class="compete-info">
-          <strong>Workato</strong>
-          <span>iPaaS · No-code automation · MuleSoft competitor</span>
-          <span class="compete-tag compete-tag-medium">Growing in gov integration</span>
-        </div>
-        <div class="compete-where">MuleSoft depth · Agentforce data needs · Gov compliance</div>
-        <button class="btn-compete-details" data-competitor="workato">Battle Card →</button>
-      </div>
-
-      <div class="compete-card" data-competitor="legacy">
-        <div class="compete-logo">🖥️</div>
-        <div class="compete-info">
-          <strong>Bespoke / Legacy Systems</strong>
-          <span>Custom-built portals · Aging platforms · Inertia</span>
-          <span class="compete-tag compete-tag-hard">The biggest "competitor" is doing nothing</span>
-        </div>
-        <div class="compete-where">TCO argument · Policy change cost · AI readiness</div>
-        <button class="btn-compete-details" data-competitor="legacy">Battle Card →</button>
-      </div>
-
-    </div>
-
-    <!-- Battle card detail panel -->
-    <div class="compete-detail hidden" id="compete-detail">
-      <div class="analysis-header">
-        <button class="btn-back" id="compete-back-btn">← Back to competitors</button>
-        <h3 id="compete-detail-title">Battle Card</h3>
-      </div>
-      <div class="analysis-body" id="compete-detail-body">
-        <div class="lesson-loading">
-          <div class="spinner"></div>
-          <p>Loading battle card...</p>
-        </div>
+      <textarea class="drill-input" id="drill-response" placeholder="Type your response to this objection…"></textarea>
+      <button class="drill-submit" onclick="submitDrill()">Get Feedback</button>
+      <button class="drill-next" onclick="nextDrill()">New Objection ↻</button>
+      <div id="drill-feedback" style="display:none;" class="feedback-box">
+        <div class="score" id="drill-score">8/10</div>
+        <h4 id="drill-grade">Strong response — you separated the products well</h4>
+        <p id="drill-feedback-text">You correctly identified that M365 is for collaboration, not citizen-facing case management. Good use of the "different problems" framing. Next time, try to end with a question that surfaces their pain rather than just positioning.</p>
+        <div class="better"><strong>Even stronger version:</strong><span id="drill-better">"The WofG Microsoft deal is great for internal Teams and Office — completely understand that. When you've got a citizen submitting a grant application that touches four departments, can Teams manage that workflow end-to-end? That's where we sit. Have you had situations where a process breaks down because it's moving between systems?"</span></div>
       </div>
     </div>
+  </div>
+</div>
 
-  </section>
+<!-- ── COMPETE ── -->
+<div id="tab-compete" class="tab-pane">
+  <div class="page-head"><h2>Competitive Battle Cards</h2><p>Every competitor you will hit in NSW State and Local Government — where they are strong, where Salesforce wins, and the exact conversation to have. Click any card for AI-generated coaching.</p></div>
+  <div class="compete-grid">
+    <div class="compete-card" style="border-top:3px solid #7C3AED;"><h3>Slack vs Microsoft Teams <span class="pitch-badge">PITCH</span></h3><div class="truth"><strong>The opportunity:</strong> Every council and state agency uses Teams. Slack + Agentforce is the $20K door-opener — start with one use case, one team, expand.<br><br><strong>What Teams can't do:</strong> External collaboration with citizens/contractors, AI-native workflow automation, Agentforce integration for intelligent routing.</div><div class="talk-track"><strong>Your line:</strong>"You're on Teams — totally understand. We're not looking to replace it. One use case: your planning team coordinating on a complex DA. Slack Connect lets you pull in the applicant, the architect, and your internal team in one channel. With Agentforce, status updates become automatic. Would that save your team time?"</div></div>
+    <div class="compete-card" style="border-top:3px solid #1E40AF;"><h3>Microsoft <span class="vs-badge">VS</span></h3><div class="truth"><strong>What they say:</strong> "We have a whole-of-government Microsoft agreement. Everything runs through Teams and Power Platform."<br><br><strong>The truth:</strong> M365 is collaboration. Power Platform handles simple automation. Neither manages complex multi-party citizen journeys or grant programs at scale.</div><div class="talk-track"><strong>Your line:</strong>"The WofG Microsoft deal is great for internal collaboration — but when a citizen submits a grant application that touches 4 departments, Power Platform can't manage that workflow. That's where we sit. Have you had situations where a process breaks down moving between systems?"<br><br><strong>Proof point:</strong> Queensland QBCC just ran an Agentforce PoC for licensing triage — replacing a Microsoft workflow. Salesforce delivered in weeks.</div></div>
+    <div class="compete-card" style="border-top:3px solid #0F766E;"><h3>ServiceNow <span class="vs-badge">VS</span></h3><div class="truth"><strong>What they say:</strong> "We use ServiceNow for our ITSM. It handles everything."<br><br><strong>The truth:</strong> ServiceNow is built for IT service management. It struggles with citizen-facing case management, grant programs, and multi-party journeys. Different architecture.</div><div class="talk-track"><strong>Your line:</strong>"ServiceNow owns your ITSM — that makes sense. When you need to manage a citizen application that crosses multiple agencies, or a grant program with 500 applicants, how does ServiceNow handle that? We've seen councils find that's where the gap opens up."<br><br><strong>Proof point:</strong> Queensland Family &amp; Child Commission went live on Salesforce in 3 months for their Reportable Conduct Scheme. ServiceNow couldn't handle the case management complexity.</div></div>
+    <div class="compete-card" style="border-top:3px solid #92400E;"><h3>Technology One <span class="vs-badge">VS</span></h3><div class="truth"><strong>What they say:</strong> "We're on TechOne. It's deeply embedded in our council."<br><br><strong>The truth:</strong> TechOne owns financials and back-office. It doesn't own citizen engagement, case management, or AI-driven service delivery. The gap is the citizen front door.</div><div class="talk-track"><strong>Your line:</strong>"TechOne is solid on the back office — financials, procurement. When a resident calls about a DA status or wants to report a missed bin online, where does that sit? That's the gap we solve — the citizen front door."</div></div>
+    <div class="compete-card" style="border-top:3px solid #166534;"><h3>Civica Authority / Ci Anywhere <span class="vs-badge">VS</span></h3><div class="truth"><strong>What they say:</strong> "Civica handles our permits and licensing."<br><br><strong>The truth:</strong> Civica has point solutions for specific council workflows. Salesforce provides a unified platform — permit, complaint, and grant all in one system with one citizen view.</div><div class="talk-track"><strong>Your line:</strong>"Civica does a good job on specific workflows. The challenge we hear is when you've got Civica for permits, something else for complaints, something else for grants — your team is re-entering data three times. Does that sound familiar?"</div></div>
+    <div class="compete-card" style="border-top:3px solid #1E3A5F;"><h3>SAP <span class="vs-badge">VS</span></h3><div class="truth"><strong>What they say:</strong> "SAP handles our finance and HR."<br><br><strong>The truth:</strong> SAP is a back-office ERP — finance, HR, procurement in large state agencies. It doesn't touch citizen services, case management, or grant programs. MuleSoft connects them.</div><div class="talk-track"><strong>Your line:</strong>"SAP owns your finance and HR — that makes sense. The citizen-facing side — service requests, grants, case management — that's a different layer. We sit on top of SAP, not instead of it. MuleSoft pulls the data together."</div></div>
+    <div class="compete-card" style="border-top:3px solid #991B1B;"><h3>Oracle <span class="vs-badge">VS</span></h3><div class="truth"><strong>What they say:</strong> "We run Oracle for our financials."<br><br><strong>The truth:</strong> Oracle is back-office ERP. Like SAP, it doesn't manage citizen engagement or case journeys. MuleSoft integrates cleanly with Oracle.</div><div class="talk-track"><strong>Your line:</strong>"Oracle is solid on the finance side. The gap we're talking about is the citizen engagement layer — the front door of your agency. MuleSoft pulls Oracle data into the unified view so nothing falls through."</div></div>
+    <div class="compete-card" style="border-top:3px solid #0284C7;"><h3>Workato <span class="vs-badge">VS</span></h3><div class="truth"><strong>What they say:</strong> "We use Workato for our integrations."<br><br><strong>The truth:</strong> Workato is a workflow automation tool — it connects systems but doesn't manage the citizen relationship or end-to-end case journey.</div><div class="talk-track"><strong>Your line:</strong>"Workato is a great integration layer — it moves data between systems. The question is what system sits at the centre managing the relationship. Are you using Workato to connect things to something, or is it the destination?"</div></div>
+  </div>
+</div>
 
-
-  <!-- PERSONAS TAB -->
-  <section id="tab-personas" class="tab-pane hidden">
-    <div class="section-intro">
-      <h2>Buyer Persona Guide</h2>
-      <p>Every person you will encounter in NSW State, Local and Education. What they do, what they care about, their challenges, and how to open a conversation with them.</p>
+<!-- ── PERSONAS ── -->
+<div id="tab-personas" class="tab-pane">
+  <div class="page-head"><h2>Buyer Persona Guide</h2><p>Every person you will encounter in NSW State and Local Government. What they do, what they care about, their challenges, and how to open a conversation with them.</p></div>
+  <div class="persona-layout" style="box-shadow:0 1px 8px rgba(0,0,0,0.06);border-radius:12px;">
+    <div class="persona-sidebar">
+      <div class="section-label">State Government</div>
+      <button class="active" onclick="showPersona('cio',this)">Chief Information Officer</button>
+      <button onclick="showPersona('cdo',this)">Chief Digital Officer</button>
+      <button onclick="showPersona('ddt',this)">Director of Digital Transformation</button>
+      <button onclick="showPersona('dsd',this)">Director of Service Delivery</button>
+      <button onclick="showPersona('ict',this)">ICT Procurement Manager</button>
+      <button onclick="showPersona('pd',this)">Program Director</button>
+      <button onclick="showPersona('ea',this)">Enterprise Architect</button>
+      <div class="section-label">Local Council</div>
+      <button onclick="showPersona('ceo',this)">CEO / General Manager</button>
+      <button onclick="showPersona('dop',this)">Director of Planning</button>
+      <button onclick="showPersona('dce',this)">Director of Customer Experience</button>
+      <button onclick="showPersona('itm',this)">IT Manager</button>
+      <button onclick="showPersona('dcs',this)">Director of Corporate Services</button>
+      <button onclick="showPersona('mda',this)">Manager of Development Assessment</button>
     </div>
+    <div class="persona-content" id="persona-content"></div>
+  </div>
+  <div style="margin-top:28px;background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 8px rgba(0,0,0,0.06);">
+  <div style="font-size:12px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;">🏆 ANZ Live Customers — Use These In Every Call</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+    <div style="background:#F0FDF4;border-radius:8px;padding:14px;border-left:4px solid #22C55E;">
+      <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">Queensland Family & Child Commission</div>
+      <div style="font-size:12px;color:#166534;">Reportable Conduct Scheme · Live July 2026 · Delivered in 3 months with Infosys · PSS Case Management</div>
+    </div>
+    <div style="background:#F0FDF4;border-radius:8px;padding:14px;border-left:4px solid #22C55E;">
+      <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">Safe Food Queensland</div>
+      <div style="font-size:12px;color:#166534;">PSS Licensing, Permitting & Inspections · Live June 2026 · First of its kind in QLD</div>
+    </div>
+    <div style="background:#F0FDF4;border-radius:8px;padding:14px;border-left:4px solid #22C55E;">
+      <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">Public Trustee of Queensland</div>
+      <div style="font-size:12px;color:#166534;">Behind 90% of QLD agencies → Leading 90% in 18 months · Full Salesforce transformation</div>
+    </div>
+    <div style="background:#F0FDF4;border-radius:8px;padding:14px;border-left:4px solid #22C55E;">
+      <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">Legal Aid Queensland</div>
+      <div style="font-size:12px;color:#166534;">Replacing 30-year legacy grants system · PSS Grants Management · New logo win</div>
+    </div>
+    <div style="background:#DBEAFE;border-radius:8px;padding:14px;border-left:4px solid #3B82F6;">
+      <div style="font-size:13px;font-weight:700;color:#1E40AF;margin-bottom:4px;">University of Melbourne</div>
+      <div style="font-size:12px;color:#1E40AF;">First student-facing AI assistant in Australian Higher Ed · Agentforce Education · Live now</div>
+    </div>
+    <div style="background:#DBEAFE;border-radius:8px;padding:14px;border-left:4px solid #3B82F6;">
+      <div style="font-size:13px;font-weight:700;color:#1E40AF;margin-bottom:4px;">SA Department for Education</div>
+      <div style="font-size:12px;color:#1E40AF;">Education Cloud + PSS + Experience Cloud + MuleSoft PoC · Digital Enrolment Solution · Live</div>
+    </div>
+  </div>
+</div>
+</div>
 
-    <div class="personas-layout">
-      <div class="personas-sidebar">
-        <div class="persona-group-label">STATE GOVERNMENT</div>
-        <button class="persona-list-btn active" data-persona="state_cio_persona">Chief Information Officer</button>
-        <button class="persona-list-btn" data-persona="state_cdo">Chief Digital Officer</button>
-        <button class="persona-list-btn" data-persona="state_director_digital">Director of Digital Transformation</button>
-        <button class="persona-list-btn" data-persona="state_service_delivery">Director of Service Delivery</button>
-        <button class="persona-list-btn" data-persona="state_procurement">ICT Procurement Manager</button>
-        <button class="persona-list-btn" data-persona="state_program_director">Program Director</button>
-        <button class="persona-list-btn" data-persona="state_architect">Enterprise Architect</button>
+<!-- ── PROGRESS TRACKER ── -->
+<div id="tab-tracker" class="tab-pane">
+  <div class="page-head"><h2>BDR Progress Tracker</h2><p>Track individual BDR development week by week. From first call to promotion-ready — every skill measured, every gap visible, every win recorded.</p></div>
 
-        <div class="persona-group-label" style="margin-top:16px;">LOCAL COUNCIL</div>
-        <button class="persona-list-btn" data-persona="council_ceo">CEO / General Manager</button>
-        <button class="persona-list-btn" data-persona="council_planning_dir">Director of Planning</button>
-        <button class="persona-list-btn" data-persona="council_cx">Director of Customer Experience</button>
-        <button class="persona-list-btn" data-persona="council_it_mgr">IT Manager</button>
-        <button class="persona-list-btn" data-persona="council_corporate">Director of Corporate Services</button>
-        <button class="persona-list-btn" data-persona="council_da_mgr">Manager of Development Assessment</button>
-      </div>
-      <div class="persona-detail-panel" id="persona-detail-panel">
-        <div class="lesson-loading">
-          <div class="spinner"></div>
-          <p>Select a persona to load their profile...</p>
+  <!-- BDR SELECTOR -->
+  <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+    <button onclick="showBDR('phoebe',this)" style="padding:10px 20px;border-radius:8px;border:2px solid var(--blue);background:#EEF4FF;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;">Phoebe W. — New Starter</button>
+    <button onclick="showBDR('katie',this)" style="padding:10px 20px;border-radius:8px;border:2px solid #e0e5ee;background:#fff;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;">Katie A. — Developing</button>
+  </div>
+
+  <div id="tracker-content"></div>
+</div>
+
+<script>
+// ── TRACKER DATA ──
+const bdrData = {
+  phoebe: {
+    name: 'Phoebe W.',
+    role: 'BDR — Education, Public Sector',
+    started: 'August 2026 · Week 1',
+    status: '🔴 New Starter',
+    weeks: [
+      {week:'Week 1',label:'First Week',skills:[
+        {name:'Cold Call Confidence',score:3,status:'needs',note:'Freezing after first objection. Defaulting to "send me info". Needs permission-based opener practice.'},
+        {name:'MEDDIC Discovery',score:2,status:'needs',note:'Not asking qualifying questions. Booking meetings without pain confirmed.'},
+        {name:'Objection Handling',score:2,status:'needs',note:'No competes knowledge yet. "We use Microsoft" stops the call.'},
+        {name:'Territory Knowledge',score:3,status:'needs',note:'Learning state gov landscape. Doesn\'t know BuyICT or DA automation context yet.'},
+        {name:'AE Partnership',score:4,status:'developing',note:'Enthusiastic. AE says meeting notes are thin but she\'s trying.'},
+      ]},
+      {week:'Week 4',label:'Month 1 Complete',skills:[
+        {name:'Cold Call Confidence',score:6,status:'developing',note:'Permission-based opener landing well. Still rushes past pain to next step.'},
+        {name:'MEDDIC Discovery',score:5,status:'developing',note:'Asking M and I questions. Missing Economic Buyer and Decision Process consistently.'},
+        {name:'Objection Handling',score:5,status:'developing',note:'Handles Microsoft objection. Still weak on ServiceNow and TechOne.'},
+        {name:'Territory Knowledge',score:6,status:'developing',note:'Knows state gov structure. Understanding DA backlog context.'},
+        {name:'AE Partnership',score:6,status:'developing',note:'Meeting notes improving. One AE asked to keep her on their accounts.'},
+      ]},
+      {week:'Week 8',label:'Promotion Checkpoint',skills:[
+        {name:'Cold Call Confidence',score:8,status:'strong',note:'Consistent permission opener. Slows down on pain. Earns next step naturally.'},
+        {name:'MEDDIC Discovery',score:7,status:'strong',note:'Full MEDDIC in 80% of discoveries. Economic Buyer ID now standard.'},
+        {name:'Objection Handling',score:8,status:'strong',note:'Handles all 5 main competes. Started coaching newer starter.'},
+        {name:'Territory Knowledge',score:8,status:'strong',note:'Deep NSW gov context. References budget papers in calls.'},
+        {name:'AE Partnership',score:8,status:'strong',note:'3 AEs have requested she stays on their accounts. Stage 2 quality high.'},
+      ]}
+    ],
+    pipeline: [{week:'W1',val:0},{week:'W2',val:1},{week:'W3',val:2},{week:'W4',val:4},{week:'W5',val:5},{week:'W6',val:7},{week:'W7',val:8},{week:'W8',val:11}]
+  },
+  richie: {
+    name: 'Richie R.',
+    role: 'BDR — State/Local (NSW)',
+    started: 'Jan 2025 · Tenured → ECS Promotion Pending',
+    status: '🏆 Top Performer → AS Transition',
+    weeks: [
+      {week:'Current',label:'Current Performance',skills:[
+        {name:'Cold Call Confidence',score:9,status:'strong',note:'Opens cold calls with government-specific context every time. Rarely gets cut short.'},
+        {name:'MEDDIC Discovery',score:9,status:'strong',note:'Full MEDDIC standard. AEs say his notes are the best on the team.'},
+        {name:'Objection Handling',score:8,status:'strong',note:'Handles all competes. Has built his own Slack vs Teams story.'},
+        {name:'Territory Knowledge',score:9,status:'strong',note:'Deep expertise in NSW councils. Knows every DA backlog story.'},
+        {name:'AE Partnership',score:9,status:'strong',note:'$6.4M pipeline. AEs compete to have him on their accounts.'},
+      ]},
+      {week:'Next Step',label:'AS Readiness',skills:[
+        {name:'POV Construction',score:7,status:'developing',note:'Building AE-level POVs. Needs more practice on multi-cloud narrative.'},
+        {name:'Executive Presence',score:7,status:'developing',note:'Strong with directors. Needs coaching for C-suite calls.'},
+        {name:'Deal Progression',score:6,status:'developing',note:'Good at booking meetings. Learning to stay involved post-Stage 2.'},
+        {name:'Pipeline Strategy',score:8,status:'strong',note:'Territory planning is excellent. Prioritising the right accounts.'},
+        {name:'Commercial Acumen',score:7,status:'developing',note:'Understands ACV. Learning multi-year deal construction.'},
+      ]}
+    ],
+    pipeline: [{week:'W1',val:8},{week:'W2',val:9},{week:'W3',val:10},{week:'W4',val:11},{week:'W5',val:11},{week:'W6',val:12},{week:'W7',val:13},{week:'W8',val:14}]
+  },
+  katie: {
+    name: 'Katie A.',
+    role: 'BDR — SA/WA',
+    started: 'January 2026 · Month 6',
+    status: '🟡 Developing',
+    weeks: [
+      {week:'Month 3',label:'Month 3 Assessment',skills:[
+        {name:'Cold Call Confidence',score:6,status:'developing',note:'Good opener. Loses confidence when prospect goes off-script.'},
+        {name:'MEDDIC Discovery',score:5,status:'developing',note:'Asks about pain well. Consistently misses Economic Buyer.'},
+        {name:'Objection Handling',score:4,status:'needs',note:'Microsoft objection stops her. Needs compete drills.'},
+        {name:'Territory Knowledge',score:6,status:'developing',note:'Learning SA/WA council landscape. Good on water/infrastructure sector.'},
+        {name:'AE Partnership',score:5,status:'developing',note:'AE feedback: meetings are real but notes are thin.'},
+      ]},
+      {week:'Month 6',label:'Month 6 — Current',skills:[
+        {name:'Cold Call Confidence',score:7,status:'strong',note:'Solid opener. Handles off-script with "that\'s interesting — tell me more."'},
+        {name:'MEDDIC Discovery',score:7,status:'strong',note:'Economic Buyer now standard question. Decision Process still weak.'},
+        {name:'Objection Handling',score:6,status:'developing',note:'Handles Microsoft and ServiceNow. SAP and TechOne still gaps.'},
+        {name:'Territory Knowledge',score:8,status:'strong',note:'Deep SA council knowledge. Referenced Mining WA budget in call last week.'},
+        {name:'AE Partnership',score:7,status:'strong',note:'AE notes improved significantly. Stage 2 rejection rate dropped.'},
+      ]}
+    ],
+    pipeline: [{week:'M1',val:1},{week:'M2',val:3},{week:'M3',val:4},{week:'M4',val:5},{week:'M5',val:6},{week:'M6',val:8}]
+  }
+};
+
+function showBDR(key, el) {
+  document.querySelectorAll('#tab-tracker button').forEach(b => { b.style.borderColor='#e0e5ee'; b.style.background='#fff'; b.style.color='var(--text)'; });
+  el.style.borderColor='var(--blue)'; el.style.background='#EEF4FF'; el.style.color='var(--blue)';
+  const d = bdrData[key];
+  const statusColor = {
+    needs: {bg:'#FEE2E2',color:'#991B1B',label:'Needs Work'},
+    developing: {bg:'#FEF3C7',color:'#92400E',label:'Developing'},
+    strong: {bg:'#D1FAE5',color:'#065F46',label:'Strong'},
+    promotion: {bg:'#DBEAFE',color:'#1E40AF',label:'Promotion Ready'}
+  };
+  let html = `<div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 8px rgba(0,0,0,0.06);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h3 style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:3px;">${d.name}</h3>
+      <div style="font-size:13px;color:#6B7280;margin-bottom:3px;">${d.role}</div>
+      <div style="font-size:12px;color:#9CA3AF;">${d.started}</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:16px;font-weight:700;">${d.status}</div>
+      <div style="font-size:12px;color:#6B7280;margin-top:4px;">Pipeline: <strong style="color:var(--blue);">${d.pipeline[d.pipeline.length-1].val} Stage 2s</strong> this period</div>
+    </div>
+  </div>`;
+
+  // Timeline blocks
+  html += `<div style="display:grid;grid-template-columns:repeat(${d.weeks.length},1fr);gap:16px;margin-bottom:24px;">`;
+  d.weeks.forEach((wk, wi) => {
+    const isLast = wi === d.weeks.length - 1;
+    const avg = Math.round(wk.skills.reduce((a,s) => a+s.score, 0) / wk.skills.length * 10) / 10;
+    const avgColor = avg >= 7 ? '#065F46' : avg >= 5 ? '#92400E' : '#991B1B';
+    const avgBg = avg >= 7 ? '#D1FAE5' : avg >= 5 ? '#FEF3C7' : '#FEE2E2';
+    html += `<div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,0.06);border-top:3px solid ${isLast ? 'var(--blue)' : '#e0e5ee'};">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#9CA3AF;">${wk.week}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px;">${wk.label}</div>
         </div>
-      </div>
-    </div>
-  </section>
+        <div style="background:${avgBg};color:${avgColor};padding:5px 10px;border-radius:20px;font-size:13px;font-weight:900;">${avg}/10</div>
+      </div>`;
+    wk.skills.forEach(s => {
+      const sc = statusColor[s.status];
+      const pct = (s.score/10)*100;
+      html += `<div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:12px;font-weight:600;color:var(--text);">${s.name}</span>
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:${sc.bg};color:${sc.color};">${sc.label}</span>
+        </div>
+        <div style="height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${s.score>=7?'#22C55E':s.score>=5?'#F59E0B':'#EF4444'};border-radius:3px;transition:width 0.5s;"></div>
+        </div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:3px;line-height:1.4;">${s.note}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
 
-  <script src="app.js"></script>
+  // Pipeline chart (simple bar)
+  html += `<div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 8px rgba(0,0,0,0.06);">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;">Pipeline Contribution — Stage 2s Generated</div>
+    <div style="display:flex;align-items:flex-end;gap:8px;height:80px;">`;
+  const maxVal = Math.max(...d.pipeline.map(p => p.val));
+  d.pipeline.forEach(p => {
+    const h = maxVal > 0 ? Math.round((p.val/maxVal)*70) : 0;
+    html += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+      <div style="font-size:10px;font-weight:700;color:var(--blue);">${p.val}</div>
+      <div style="width:100%;height:${h}px;background:var(--blue);border-radius:4px 4px 0 0;min-height:4px;"></div>
+      <div style="font-size:10px;color:#9CA3AF;">${p.week}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  document.getElementById('tracker-content').innerHTML = html;
+}
+
+// ── DATA ──
+const ccData = {
+  david:{name:'David Chen',role:'CIO · NSW Dept. of Customer Service',conv:[
+    {from:'prospect',text:'David Chen.'},
+    {from:'prospect',text:'You\'ve got 90 seconds. What is this about?'},
+    {from:'prospect',text:'Okay. We\'ve got the AI mandate but the harder problem is building intelligence onto citizen services that aren\'t properly digitised yet. What are you actually talking about?'},
+    {from:'prospect',text:'...yes. Our citizen portal runs on three different systems. Every policy change breaks something. We had a 6-week delay last October on a payment threshold change. I\'ve got a Minister\'s briefing this afternoon on contact centre numbers. You\'ve got my attention.'},
+    {from:'prospect',text:'That October situation is exactly the pattern. Send something through to my EA. Tuesday afternoon works. Make it specific to our ServiceNSW context — I don\'t want a generic demo. ✓ Meeting booked.'}
+  ]},
+  sarah:{name:'Sarah Okafor',role:'Director of Digital Transformation · NSW Health',conv:[
+    {from:'prospect',text:'Sarah Okafor. Yes?'},
+    {from:'prospect',text:'We have real concerns about AI and patient data. Everything has to stay in Australia. That\'s non-negotiable.'},
+    {from:'prospect',text:'Partly. The other issue is our legacy systems — every time policy changes, something breaks. Last year it was a 3-week delay on a clinical pathway update.'},
+    {from:'prospect',text:'Yes — send through a calendar invite. Make it brief and relevant. ✓ Meeting booked.'}
+  ]},
+  marcus:{name:'Marcus Webb',role:'Director of Planning · Blacktown City Council',conv:[
+    {from:'prospect',text:'Marcus Webb. Make it quick — I\'ve got a council meeting.'},
+    {from:'prospect',text:'1,400 applications. State\'s breathing down my neck. What do you actually do about it?'},
+    {from:'prospect',text:'Our IT manager says we can\'t afford implementations. That\'s always the wall.'},
+    {from:'prospect',text:'...send me something about the grant. If the numbers check out I\'ll give you 30 minutes. ✓ Next step committed.'}
+  ]},
+  jenny:{name:'Jenny Tran',role:'IT Manager · Inner West Council',conv:[
+    {from:'prospect',text:'Jenny Tran, Inner West IT. What company are you from?'},
+    {from:'prospect',text:'...okay. At least you\'re honest about it. What do you do?'},
+    {from:'prospect',text:'Residents complain constantly. We\'re on an aging portal, Microsoft for everything else. Zero budget approved this year.'},
+    {from:'prospect',text:'February budget cycle. GM and the Director of Customer Service would be involved. Send me something first. ✓ Next step committed.'}
+  ]}
+};
+
+const discData = {
+  david:{name:'David Chen',role:'CIO · NSW DCS',conv:[
+    {from:'prospect',text:'*adjusts webcam, leaning back with a coffee* Good morning. So — you mentioned multi-party citizen journeys on the call. I took the meeting because that\'s actually our exact problem. We\'ve got a hard stop at the half hour — I\'m into a Minister\'s office briefing after this. Where do you want to start?'},
+    {from:'prospect',text:'The contact centre metric is 25% volume reduction by FY28. That\'s what I report to the Deputy Secretary monthly. Right now we\'re at about 8% improvement. Not enough. The challenge is our citizen portal runs on three systems — and when a citizen submits something that touches multiple agencies, it breaks.'},
+    {from:'prospect',text:'The $18M is confirmed in the FY27 budget. I\'m the economic buyer for anything under $5M. Above that it goes to the Deputy Secretary with a business case. For a pilot — that\'s absolutely within my remit.'},
+    {from:'prospect',text:'We\'ve looked at ServiceNow but our solution architects say it\'s ITSM-native — not built for citizen journeys. Microsoft Power Platform was pushed hard by our IT team but it couldn\'t handle the multi-party approval workflows we need. My technical BA Priya has been evaluating options.'},
+    {from:'prospect',text:'March 31 is when I need a decision to meet the FY28 mandate. Any engagement would need to go through DTA digital marketplace or BuyICT — we\'re covered up to $450K on direct sourcing. What does a pilot typically look like?'}
+  ]},
+  marcus:{name:'Marcus Webb',role:'Director of Planning · Blacktown City Council',conv:[
+    {from:'prospect',text:'Right — so you actually know about the backlog. Most vendors lead with "AI" and have no idea what a planning director does. I\'ve got 30 minutes. What do you want to know?'},
+    {from:'prospect',text:'The backlog is 1,400 applications. State government wants it cleared by end of FY27. We process everything manually — PDAs come in by email, data gets re-entered three times across our systems. My team spent three weeks re-coding when a threshold changed in October.'},
+    {from:'prospect',text:'The General Manager would sign anything over $200K. Under that I can approve. Our procurement goes through council\'s standard supplier panel — we\'d need you on there or go direct sourcing under threshold.'},
+    {from:'prospect',text:'We\'ve had Civica for years for DA management. TechOne for finance. What\'s the integration story? And our IT manager\'s instinct is always "we can\'t afford implementations" — he\'d be in any conversation.'}
+  ]},
+  sarah:{name:'Sarah Okafor',role:'Director of Digital Transformation · NSW Health',conv:[
+    {from:'prospect',text:'I took this meeting because you mentioned data residency on the call — that\'s actually our number one blocker on AI. Where does Salesforce sit on that?'},
+    {from:'prospect',text:'The $8M is Federal investment for FY27. I report on it quarterly. The mandate is reducing clinician admin by 30% — which means anything that touches patient data has to be IRAP assessed and Australian-hosted. That\'s non-negotiable.'},
+    {from:'prospect',text:'The biggest problem is our legacy systems. Every time there\'s a policy change, something breaks downstream. Last year a clinical pathway update caused a 3-week delay. We had a failed implementation in FY24 that went over budget — so the bar for new vendors is high.'},
+    {from:'prospect',text:'We\'d want a proof of concept before any commitment. My technical lead would be involved in evaluating architecture. What does a typical engagement start look like?'}
+  ]},
+  jenny:{name:'Jenny Tran',role:'IT Manager · Inner West Council',conv:[
+    {from:'prospect',text:'Okay — you were upfront about the budget thing on the call, so I\'ll give you the 30 minutes. But I want to be clear: the CEO said explicitly no new vendors this year.'},
+    {from:'prospect',text:'The council website is embarrassing. Residents complain constantly. We\'re on a 10-year-old portal, Microsoft for everything internal. My biggest headache is residents calling because they can\'t find information online.'},
+    {from:'prospect',text:'February budget cycle. The GM and Director of Customer Experience would both need to be involved. We went through a bad implementation 4 years ago — the whole council is gun-shy about new tech.'},
+    {from:'prospect',text:'What would a realistic starting point look like — given the budget situation?'}
+  ]}
+};
+
+const objections = [
+  {text:'"We already have a whole-of-government Microsoft agreement. Everything runs through Teams and Power Platform. I don\'t see what Salesforce adds."',persona:'IT Manager, NSW State Agency',diff:'Medium',score:'8/10',grade:'Strong — you separated the products well',feedback:'You correctly identified that M365 is for collaboration, not citizen-facing case management. Good use of the "different problems" framing. End with a question that surfaces pain.',better:'"The WofG Microsoft deal is great for internal Teams and Office — completely understand that. When you\'ve got a citizen submitting a grant application that touches four departments, can Teams manage that workflow end-to-end? That\'s where we sit. Have you had situations where a process breaks down because it\'s moving between systems?"'},
+  {text:'"Procurement takes too long. We don\'t have time for a 12-month implementation. We need solutions now."',persona:'Director of Planning, Blacktown Council',diff:'Hard',score:'7/10',grade:'Good — you addressed timeline but missed the grant angle',feedback:'You correctly pushed back on the 12-month assumption. But you didn\'t mention the NSW AI Early Adopter Grant which could change the calculus entirely.',better:'"Totally hear you on timeline pressure. A couple of things — first, we\'re on BuyICT so there\'s no open tender. Second, there\'s an NSW AI Early Adopter Grant specifically for councils right now that funds the first stage. That changes the budget conversation. Have you looked at that?"'},
+  {text:'"We use ServiceNow for everything. Our ITSM is sorted, and IT says ServiceNow can handle citizen services too."',persona:'CIO, NSW Government Agency',diff:'Hard',score:'6/10',grade:'Partially there — but didn\'t expose the gap specifically',feedback:'You positioned PSS correctly but didn\'t ask a question that makes them self-discover the gap. Always end with a question.',better:'"ServiceNow is excellent for ITSM — it should stay. The question is citizen-facing case management. When a citizen applies for a grant or lodges a complaint that involves multiple departments — how does ServiceNow manage that journey? We\'ve seen agencies find that\'s where the architecture struggles."'},
+  {text:'"Just send me some information. I\'ll have a look when I get a chance."',persona:'Program Director, Services Australia',diff:'Easy',score:'5/10',grade:'Too passive — you sent the info without qualifying',feedback:'Sending information without a next step committed is how deals die. Always get a specific next action.',better:'"I can absolutely send something through — what would be most relevant for you right now? And when you get a look, what would make you want a conversation? Is it the data residency piece, the citizen case management, or something else? That way I can make sure what I send is worth your time."'},
+  {text:'"We tried Salesforce a few years ago and it didn\'t work out. We moved away from it."',persona:'IT Manager, Inner West Council',diff:'Very Hard',score:'7/10',grade:'Good empathy — but didn\'t dig into what went wrong',feedback:'Acknowledging the past failure was right. But you need to understand specifically what went wrong before positioning the present.',better:'"That\'s really important to know — and I appreciate you being upfront about it. What specifically didn\'t work? Was it the implementation, the product fit, or how it was supported? I\'m asking because what\'s available now — particularly for citizen service delivery — is genuinely different, but I\'d rather understand your experience than just pitch past it."'}
+];
+
+const personaData = {
+  cio:{name:'David Chen (Example)',role:'Chief Information Officer',org:'NSW Department of Customer Service',world:['AI mandate from the Minister — must digitise more services by FY28','$18M digital transformation budget confirmed for FY27','Reducing contact centre volume by 25% is their core KPI','Microsoft VSA extended but Power Platform can\'t handle complex citizen journeys','ServiceNow for ITSM but solution architects say it\'s not built for citizen case management'],opens:['Mention DA automation or citizen service complexity','Reference the NSW AI mandate with specifics and budget confirmation','Show you understand "multi-party citizen journeys" and why that\'s hard','Ask about contact centre volume — it\'s their KPI','Mention the DTA digital strategy or Hyperforce AU region'],kills:['Generic "AI" pitch without government context','"Can I book 15 minutes?" with no context','Vendor buzzwords — "digital transformation" without specifics','Not knowing what ServiceNSW is']},
+  cdo:{name:'Chief Digital Officer',role:'Chief Digital Officer',org:'NSW Government Agency',world:['Owns the digital strategy across the agency','Reports to the Secretary or CEO — large mandate, stretched resources','Focused on whole-of-government alignment and digital uplift','Cares about how digital investment maps to citizen outcomes','Often has budget but needs business case approved'],opens:['Reference DTA strategy and digital uplift mandate','Ask about their priority programs and what\'s blocking progress','Show you understand the citizen experience lens, not just technology'],kills:['Pitching product without mapping to their strategy','Not knowing what the DTA does']},
+  ddt:{name:'Sarah Okafor (Example)',role:'Director of Digital Transformation',org:'NSW Health',world:['$8M Federal funding for patient digital experience','Mandate: reduce clinician admin by 30%','Concerned about patient data sovereignty — IRAP and AU hosting non-negotiable','Legacy systems break every time policy changes','Failed implementation in FY24 — high bar for new vendors'],opens:['Reference Salesforce\'s IRAP assessment and Hyperforce AU data residency','Ask smart questions about patient-centred care specifics','Mention NSW Health or international health agency case studies'],kills:['Not knowing about IRAP','Pretending data residency isn\'t a real concern','Over-promising on implementation speed']},
+  dsd:{name:'Director of Service Delivery',role:'Director of Service Delivery',org:'NSW State Agency',world:['Owns the operational delivery of citizen-facing services','KPI: service quality, resolution times, cost per interaction','Frustrated by digital tools that don\'t match how service actually works','Often fighting with IT about what should be built','Usually not the budget holder — needs to take business case up'],opens:['Ask about service volumes and what\'s creating the most pressure','Reference specific citizen services in their portfolio','Show you understand the complexity of multi-channel service delivery'],kills:['Talking about technology without connecting to service outcomes','Not knowing what their services actually are']},
+  ict:{name:'ICT Procurement Manager',role:'ICT Procurement Manager',org:'NSW Department of Finance — Digital Sourcing',world:['Manages whole-of-government panel arrangements','Enforces Commonwealth/State Procurement Rules rigorously','Warms up when vendors understand BuyICT and procurement pathways','Cares about probity, documentation, and process compliance','Not a buyer — but influences agencies and can facilitate introductions'],opens:['Mention BuyICT and Salesforce\'s panel arrangement','Show you understand direct sourcing thresholds','Reference IRAP compliance proactively'],kills:['Not knowing procurement rules','"Can we just do a direct purchase?" without knowing threshold rules']},
+  pd:{name:'Program Director',role:'Program Director',org:'Services Australia',world:['Running a specific modernisation program with confirmed budget','KPI: on-time delivery, cost, and outcome metrics','Technical BA on their team who\'s the day-to-day champion','Burned by failed projects — very cautious about new vendors','Has the budget but needs approval for large commitments'],opens:['Ask about their specific program and what success looks like','Reference specific pain points in citizen-facing services','Show you understand complex case management — not just "AI"'],kills:['Generic demos that don\'t map to their specific program','Not asking about their technical landscape first']},
+  ea:{name:'Enterprise Architect',role:'Enterprise Architect',org:'NSW Government Agency',world:['Technical gatekeeper — evaluates platform fit and integration complexity','Cares about interoperability, security standards, and scalability','Will ask hard technical questions about APIs and architecture','Reports to the CIO or CDO — influential on buy decisions','Can block deals if they don\'t trust the platform'],opens:['Lead with MuleSoft integration capability and open APIs','Show you understand their existing tech stack before proposing','Reference government-specific architecture patterns (IRAP, ASD)'],kills:['Surface-level technical answers','Not being able to articulate API strategy']},
+  ceo:{name:'CEO / General Manager',role:'Chief Executive Officer / General Manager',org:'Local Council',world:['Accountable to Mayor and elected councillors','Focused on rate expenditure, community outcomes, and reputational risk','Unlikely to take cold calls — go through the organisation','Cares about DA turnaround, community satisfaction, and cost efficiency','Has authority to approve larger spend but rarely the initiator'],opens:['Referenced through a Director or Division Head first','Show community outcome impact, not technology','Quantify what faster DA processing means for housing delivery'],kills:['Cold calling the CEO directly','Pitching technology without connecting to community outcomes']},
+  dop:{name:'Marcus Webb (Example)',role:'Director of Planning &amp; Environment',org:'Blacktown City Council',world:['1,400+ DA applications in backlog — State Government pressure','Everything processed manually — emails, data re-entered 3 times','Housing pressure is a political mandate — speed up approvals','NSW AI Early Adopter Grant available to councils','IT manager resistant: "we can\'t afford implementations"'],opens:['Ask about the DA backlog by name — he lights up','Reference the NSW AI Early Adopter Grant for councils','Mention housing mandate and state government pressure'],kills:['Pitching "Salesforce" without understanding what a Planning Director does','Over-promising on implementation speed']},
+  dce:{name:'Director of Customer Experience',role:'Director of Customer Experience',org:'Local Council',world:['Owns the resident-facing digital experience','Frustrated by council website complaints and call centre volume','Wants a single view of the resident — not 5 disconnected systems','Often has a budget line but needs IT and GM support','Cares about Net Promoter Score and complaint resolution time'],opens:['Ask about resident complaint volumes and what\'s driving them','Reference specific CX improvement metrics','Show you understand what "one view of the resident" means operationally'],kills:['Pitching technology before understanding their current resident journey']},
+  itm:{name:'Jenny Tran (Example)',role:'IT Manager',org:'Inner West Council',world:['CEO said explicitly: zero budget this year','Managing aging Microsoft-centric environment — Teams, SharePoint','Council website is embarrassing — residents complain constantly','Tired of vendors who waste her time','Secretly knows the digital experience needs fixing'],opens:['Acknowledge the budget reality upfront — don\'t pretend it\'s not there','Ask about the NEXT budget cycle, not this one','"I understand you\'re not in a buying cycle — I want to be the person you call when that changes."'],kills:['Pretending budget isn\'t an issue','Immediately starting with products','Not respecting her time']},
+  dcs:{name:'Director of Corporate Services',role:'Director of Corporate Services',org:'Local Council',world:['Oversees finance, HR, procurement, and IT governance','Approves vendor selection and contract processes','Conservative — risk averse, process-driven','Cares about value for money and audit trails','Involved in procurement decisions but rarely the initiator'],opens:['Show strong ROI and payback case','Reference other Australian councils you\'ve worked with','Connect to efficiency gains in their specific corporate services'],kills:['Not having a business case ready','Being unable to explain procurement pathway']},
+  mda:{name:'Manager of Development Assessment',role:'Manager of Development Assessment',org:'Local Council',world:['Day-to-day owner of the DA processing backlog','Directly pressured by the Planning Director and State Government','Processing everything manually — PDFs, emails, spreadsheets','Wants automation but doesn\'t control the budget','Best person to confirm pain and sponsor internally'],opens:['Ask specifically about their DA processing workflow','Empathise with the manual burden — they\'ll open up immediately','Ask what they wish they could automate — they have a list'],kills:['Talking to them about budget — they don\'t own it','Going above their head before building the relationship']}
+};
+
+const lessonContent = {
+  mindset:{icon:'🧠',title:'Phone Confidence for BDRs',desc:'Reframe your role — you\'re qualifying, not selling. Why that mindset shift makes cold calls far less scary.',sections:[{h:'The Mindset Shift',p:'Most BDRs feel like they\'re "bothering" people when they call. That\'s the wrong frame. You\'re a qualifier — you\'re trying to find the people who have a problem you can solve. If they don\'t have the problem, you\'re saving them time. If they do, you\'re helping them.'},{h:'Why Cold Calls Feel Hard',ul:['Fear of rejection — but a "no" is just information, not personal judgement','Not knowing what to say — solved by preparation and a clear opening line','Imposter syndrome — "why would a CIO take my call?" Because you know something relevant to their problem']},{h:'The Permission Frame',p:'Before you make a call, tell yourself: "My job is to ask 2-3 good questions and see if there\'s a reason to talk more. That\'s it." Lower the bar to: did I earn the next 60 seconds?'},{h:'Your Opening Script',script:'"Hi [Name] — [Your Name] from Salesforce. I\'ll keep it brief. I work with a few state agencies on [specific challenge]. Wanted to see if that\'s on your radar right now — if not, I\'ll get out of your hair."'}]},
+  state101:{icon:'🏛️',title:'State & Local Government 101 — NSW Focus',desc:'Budget cycles, DTA strategy, BuyICT, IRAP — the context every BDR needs to sound credible on the phone.',sections:[{h:'The Financial Year',p:'NSW State Government runs July 1 – June 30. Budget is confirmed in May each year (Federal) and June (State). FY27 runs July 2026 – June 2027. New budgets = new funding = new buying decisions. Best time to call: July-September and January-March.'},{h:'How They Buy',ul:['BuyICT Standing Offer — Salesforce is on this panel. Direct sourcing up to $450K without open tender.','Open tender for larger engagements — longer process, 6-18 months.','Whole-of-Government arrangements — Microsoft, SAP, ServiceNow have these.','Key phrase to use: "We\'re on BuyICT — so procurement can move fast."']},{h:'What They Care About Right Now',ul:['AI mandate — every NSW agency is under pressure to adopt AI by FY28.','Cyber Security Strategy — IRAP assessed platforms are trusted.','Contact centre reduction — digital self-service is the goal.','Housing affordability — councils under pressure on DA processing speed.']},{h:'IRAP and Hyperforce',p:'Every government agency will ask about data sovereignty. Your answer: "Salesforce is IRAP assessed for OFFICIAL:Sensitive and PROTECTED. Data hosted in Australia through Hyperforce AU region. This is built for regulated environments."'},{h:'The DTA',p:'Digital Transformation Agency sets whole-of-government digital strategy. Reference the DTA digital uplift mandate — it gives your call a reason to happen beyond just "checking in".'}]},
+  meddic:{icon:'🎯',title:'MEDDIC for Public Sector',desc:'All six MEDDIC elements adapted for State & Local Gov — exact questions for each.',sections:[{h:'M — Metrics',p:'What does success look like in numbers? Government KPIs include: contact centre volume reduction, DA processing time, digital self-service uptake, cost per service interaction.',script:'Question: "What metric are you being measured on for this programme? What does good look like by FY28?"'},{h:'E — Economic Buyer',p:'Who signs the contract? In government it\'s usually the CIO, CEO/GM, or Program Director for mid-range spend. Large deals go to the Deputy Secretary with a business case.',script:'Question: "If we found a good fit — who would be involved in the decision? Is that something you could approve or does it need to go up?"'},{h:'D — Decision Criteria',p:'What are they evaluating? Government adds: IRAP compliance, data sovereignty, vendor panel status, integration with existing systems.',script:'Question: "When you\'re evaluating options — what are the must-haves? I\'m guessing data residency is on that list?"'},{h:'D — Decision Process',p:'How do they buy? BuyICT, direct sourcing, open tender, panel. Timeline to decision.',script:'Question: "In terms of procurement — are you on a panel arrangement like BuyICT, or would this go to open tender? And what\'s the timeline you\'re working to?"'},{h:'I — Identify Pain',p:'What\'s the real problem? Be specific — "manual DA processing" is better than "inefficiency". Quantify where possible.',script:'Question: "Walk me through what happens today when a citizen submits a complex application. Where does it break down?"'},{h:'C — Champion',p:'Who\'s your internal advocate? Usually the Program Director or Technical BA. They sell for you when you\'re not in the room.',script:'Question: "Is there someone on your team who owns this day-to-day — a technical BA or program manager I should connect with?"'}]},
+  venn:{icon:'🔴',title:'BDR + AE + ECS — Know Your Lane',desc:'The Venn diagram problem: where BDRs operate vs AEs vs ECS.',sections:[{h:'The Three-Way Venn Diagram',p:'ECS (Enterprise Corporate Sales) works with existing high-value accounts. AEs manage territory and relationship. BDRs prospect new opportunities. The overlap causes confusion — and wasted effort.'},{h:'Where BDRs Should Focus',ul:['New accounts not currently worked by AEs','Net new contacts within existing AE accounts (with AE agreement)','Outbound prospecting to cold accounts in the territory','Event lead follow-up and inbound qualification']},{h:'Where BDRs Should NOT Step',ul:['Near-landing pipeline that ECS or AE is close to closing','Existing customer contacts without AE knowledge','Accounts the AE is actively working (coordinate first)']},{h:'The Rule',script:'"Before I call [Account], I check with [AE Name] first. If they\'re working it, I ask how I can help. If they\'re not, I own the outbound."'}]},
+  slack:{icon:'💬',title:'Slack + Agentforce — The Government Story',desc:'Every council and state agency uses Microsoft Teams. Here is the Slack story that wins anyway.',sections:[{h:'Why They\'re on Teams',p:'Whole-of-Government Microsoft agreement covers Teams licensing. IT teams default to it. Cost is zero marginal.'},{h:'Where Teams Fails Government',ul:['External collaboration with citizens or contractors — Teams doesn\'t handle this safely','Cross-agency channels — different tenants, different security models','AI-native automation — Teams + Copilot is early stage vs Agentforce in Slack','Workflow integration — Salesforce data doesn\'t live in Teams natively']},{h:'The Door-Opener: $20K Slack Use Case',p:'Start small. One use case, one team. DA notification workflow for a planning team. Agentforce routes citizen enquiries. Cross-agency channel for a housing project.',script:'Opening line: "You\'re on Teams — totally understand. We\'re not looking to replace it. One use case: your planning team coordinating on a complex DA approval. Slack Connect pulls in the applicant, the architect, and your internal team in one channel. Agentforce handles automatic status updates. Would that save your team time?"'}]},
+  stategov:{icon:'🏛️',title:'State Government NSW — SLED BDR Briefing',desc:'AI mandate FY28, IRAP, BuyICT — everything you need before calling a NSW state agency.',sections:[{h:'The AI Mandate — Your Built-In "Why Now"',p:'Every NSW government agency has been told to adopt AI by FY28. This is a government directive. For BDRs, this means you never have to manufacture urgency — it already exists.',script:'"Your agency has a mandate to adopt AI by FY28. I\'m calling because Salesforce Agentforce is IRAP-assessed and purpose-built for Australian government. I wanted to see if that\'s something on your radar."'},{h:'IRAP Clearance — What It Is',p:'IRAP = Information Security Registered Assessors Programme. Run by the Australian Signals Directorate. Salesforce Government Cloud Plus is IRAP assessed for OFFICIAL:Sensitive and PROTECTED data. This means agencies can legally store citizen records and case files on Salesforce. Most competitors haven\'t cleared this bar.',script:'When they say "we can\'t put government data in the cloud": "Salesforce has been independently IRAP assessed for PROTECTED data. Your data is compliant and stays in Australia through Hyperforce AU. That\'s not a promise — it\'s been independently verified."'},{h:'BuyICT — Kill the Tender Objection',p:'BuyICT is the NSW Government\'s pre-approved vendor panel. Salesforce is on it. Normal government procurement takes 12-18 months. BuyICT removes that — agencies can procure directly up to $450K+, no open tender required.',script:'When they say "we\'d have to go to tender": "Actually, Salesforce is on BuyICT — you can procure directly without an open tender. We can move now."'},{h:'What They Care About Right Now',ul:['AI mandate FY28 — every agency under deadline pressure','Contact centre reduction — Ministerial KPI, reduce calls with digital self-service','Legacy systems breaking on every policy change — the PSS case is obvious','Hyperforce AU + IRAP = trusted where Microsoft Copilot isn\'t fully cleared yet','BuyICT = no tender, deal can close in weeks not months']},{h:'ANZ Proof Points — Say These By Name',ul:['Queensland Family & Child Commission — Reportable Conduct Scheme, live July 2026, delivered in 3 months','Safe Food Queensland — PSS licensing & inspections, live June 2026','Public Trustee QLD — from behind 90% of agencies to leading 90% in 18 months','Legal Aid QLD — replacing 30-year legacy grants system with PSS']},{h:'Cold Call Opener',script:'"Hi [Name] — [Your] from Salesforce. Quick one — your agency has an AI adoption mandate for FY28. I work with a few NSW state agencies on Agentforce for citizen services. Is that something on your radar right now, or is it still in planning stages?"'}]},
+  council:{icon:'🏘️',title:'Local Council — SLED BDR Briefing',desc:'DA backlog, housing mandate, $20K Slack pilot — the ground truth for NSW council prospecting.',sections:[{h:'The DA Backlog — Your Door Opener',p:'DA = Development Application. Before anyone builds anything, they need council approval. NSW councils have backlogs of 1,400+ applications unprocessed, driven by the housing crisis. The NSW government has publicly mandated councils to fix this. The pain is public, measurable, and political.',script:'"I can see [Council] has a significant DA backlog right now. We\'ve helped councils process applications dramatically faster with Salesforce PSS — automated intake, routing, citizen status portal. I\'d love to show you how. Worth a 20-minute conversation?"'},{h:'Why It\'s Urgent',ul:['NSW government has given councils housing targets — must approve more DAs faster or face penalties','Every day of backlog = political heat from community and Minister','DA processing is manual and paper-heavy in most councils','Budget and urgency are real — this is mandated, not nice-to-have']},{h:'NSW AI Early Adopter Grant',p:'Active government grant programs exist for councils to adopt AI and digital platforms — this removes the "no budget" objection. In the interview, say: "There are active government grants specifically for AI adoption in councils — that removes the budget conversation."'},{h:'The $20K Door-Opener',p:'Instead of pitching a $500K enterprise deal, start small: a $20K Slack + Agentforce pilot. One team, one use case — planning team coordinating on DA approvals with Agentforce routing citizen enquiries. Low risk, then expand.',script:'"You\'re on Teams — totally understand. One use case: your planning team coordinating on a complex DA. Slack Connect pulls in the applicant, the architect, and your internal team in one channel. Agentforce handles automatic status updates. $20K to prove it works. Would that save your team time?"'},{h:'One Message Rinses and Repeats',p:'Every NSW, WA, SA, VIC council has the same problems: DA backlog, housing pressure, fragmented systems, broken citizen portals. Learn the message once — call hundreds of councils with confidence.'},{h:'Research Before You Call',p:'Google "[Council name] DA backlog" before every call — you\'ll find news articles. It\'s public pain. Use it: "I saw your council has been in the news around DA processing times — that\'s exactly where we help."'}]},
+  education:{icon:'🎓',title:'Education Territory — Universities, TAFE & Schools',desc:'International students, Education Cloud, Banner/VTAC/MuleSoft — everything for calling a university CIO.',sections:[{h:'Why Universities Are Buying Right Now',p:'International students are one of Australia\'s largest export industries (~$40B/year). Competition from UK, US, and Canada is intensifying. Australian universities are investing heavily in student experience to attract and retain international students. This is your "why now".',script:'"How are you differentiating your international student experience from UK and US universities? That\'s the conversation I\'m hearing from VCs and Registrars right now. I wanted to see if it\'s on your radar."'},{h:'The Salesforce Education Stack',ul:['Education Cloud — full student lifecycle CRM: prospecting → admissions → enrolment → student support → alumni. Purpose-built, not a generic CRM.','Marketing Cloud — targeted campaigns in source markets (China, India, Vietnam). Multilingual outreach. Tracks which campaigns actually convert to enrolments.','Agentforce — AI-powered student chatbot. University of Melbourne launched the FIRST student-facing AI assistant in Australian Higher Ed using Agentforce. Live now.','Experience Cloud — the modern student portal: grades, timetables, support requests, all in one place.','Data Cloud — unified student 360 so advisors can spot at-risk students early and intervene.','MuleSoft — connects legacy systems to Salesforce without replacing them (see Banner & VTAC below).']},{h:'Banner, VTAC & MuleSoft — The Integration Story',p:'Banner is a 30+ year old Student Information System (Ellucian) most Australian universities run. They hate it but can\'t rip it out. VTAC (Victorian Tertiary Admissions Centre) handles admissions for VIC universities. Both are old, clunky, and don\'t connect to modern platforms. MuleSoft Anypoint Platform sits in the middle — connecting Banner and VTAC to Salesforce Education Cloud without replacing anything.',script:'"You don\'t have to replace Banner. MuleSoft sits in the middle — your student data flows into Salesforce Education Cloud and your students get a modern experience on top of your existing systems. No rip-and-replace."'},{h:'TAFE',ul:['Education Cloud + PSS — enrolment management, student support','Marketing Cloud — student recruitment campaigns','TAFE NSW is actively embedding Salesforce micro-credentials in courses','TAFE is both a CUSTOMER and a source of future Salesforce users']},{h:'K-12 Schools',ul:['Education Cloud + PSS — digital enrolment, IEPs, student transfers','Service Cloud — school counselling, health and safety case management','SA Department for Education has a LIVE PoC right now: Education Cloud + PSS + Experience Cloud + MuleSoft — say this by name']},{h:'ANZ Proof Points for Education',ul:['University of Melbourne — first student-facing AI assistant in Australian Higher Ed (Agentforce). LIVE.','SA Department for Education — Education Cloud + PSS + Experience Cloud + MuleSoft PoC. LIVE.','Macquarie University — SIC running October 2026']},{h:'Cold Call Opener for Universities',script:'"Hi [Name] — [Your] from Salesforce. Quick question: are you involved in the student experience and international recruitment strategy? The reason I ask — we just went live with University of Melbourne on Agentforce for student services. It\'s the first AI student assistant in Australian Higher Ed. I wanted to see if that kind of capability is something [University] is exploring."'}]},
+  education_cold_call:{icon:'🎓',title:'Education Territory: Admissions + Student Experience Cold Call',desc:'Full cold call script, voicemail, two email templates, QTAC discovery brief, and key intel. MuleSoft overlays Banner/O2 without replacing it — that is the conversation that opens every door.',sections:[
+    {h:'The Opportunity in One Line',p:'"How many systems does your admissions team have to check to get a single view of where a student is in their journey — and how much of that is still manual?" — This works across every university, TAFE, and admissions centre. The pain is universal: siloed data, no unified student view, manual handoffs.'},
+    {h:'Key Intel Before You Call',ul:[
+      'MuleSoft is the unlock: institutions run legacy student management systems (Banner, O2) they cannot replace. MuleSoft overlays them and builds a unified profile on top — without a greenfield build. This is the conversation that opens doors.',
+      'Marketing Cloud AE is always included in education discoveries — build this into every meeting setup from the start.',
+      'Salesforce Personalisation (RTIM) is a strong differentiator where website behavioural data is uncollected — worth demoing at QTAC and similar accounts.',
+      'Contact centre is a high-value, under-worked angle — significant Agentforce + Service Cloud opportunity across universities and TAFEs.',
+      'TAFE QLD discovery scheduled — AI for admissions process is top of mind for the buyer.',
+      'QTAC (Gio) is a major whitespace opportunity: runs O2 legacy platform, fully siloed channels, no unified customer profile, B2B scope to QLD schools and colleges. NFP pricing eligibility TBC.'
+    ]},
+    {h:'Cold Call Script: Opening',script:'"Hi [Name], [Your Name] calling from Salesforce. I\'ll be quick — we\'ve been having a lot of conversations in the education sector lately about how to get a single view of the student across admissions, marketing, and the contact centre — without having to replace your core student management system. I wanted to see if that\'s a conversation worth having at [Institution Name]."'},
+    {h:'Cold Call Script: Discovery Questions',ul:[
+      '"Where\'s your biggest recruitment challenge right now — is it top-of-funnel volume, applicant drop-off, or converting enquiries into enrolled students?"',
+      '"How are your engagement channels set up today — is the contact centre, email, and portal all talking to each other, or are they still largely separate?"',
+      '"Has AI come up yet in your admissions conversations — are you looking at how to use it to guide students through pathways, or is that still on the roadmap?"'
+    ]},
+    {h:'Objection Handler: "We already have a CRM / we\'re mid-project"',script:'"That makes sense — most institutions I talk to aren\'t starting from zero. The question I\'d ask is whether your current setup gives you a single view of the student across admissions, marketing, and service — because that\'s usually where the gap is. Happy to share what a few similar institutions are doing and see if it\'s relevant. Worth 20 minutes?"'},
+    {h:'Close',script:'"I\'ll send across a short overview of how we\'re working with similar institutions on the admissions and contact centre story. Our Marketing Cloud AE would typically join that conversation too — would [day] work for a quick 20 minutes?"'},
+    {h:'Voicemail Script',script:'"Hi [Name], [Your Name] from Salesforce here. I\'m calling because a lot of education institutions are trying to solve the same problem right now — a single view of the student across admissions, marketing, and the contact centre, without replacing their core systems. We\'ve got a story that connects all of that. Give me a call back on [number] — happy to keep it to 15 minutes. Speak soon."'},
+    {h:'Follow-Up Email (Connected)',p:'Subject: Unified student view + AI admissions — what we\'re seeing work\n\nHi [Name],\n\nGreat to connect. As discussed, the challenge most institutions face isn\'t data — it\'s that it\'s all in different places, and the core systems (Banner, O2, etc.) can\'t be replaced.\n\nWhat we\'re seeing work is using MuleSoft to overlay those systems and Data Cloud to build the unified student profile on top — then Agentforce to put AI-driven guidance and deflection into the admissions and contact centre workflows.\n\nOur Marketing Cloud AE would typically join this conversation too — they add a lot on the personalisation and nurture side.\n\nI\'ll send across a short overview. Happy to set up 30 minutes with the right team.\n\nDoes [day] work?\n\nKyla'},
+    {h:'Outreach Email (Not Connected)',p:'Subject: Single view of the student — without replacing your core system\n\nHi [Name],\n\nMost education institutions I speak with are dealing with the same problem: admissions, marketing, and the contact centre all have different data, different systems, and no shared view of the student.\n\nThe good news is you don\'t need to rip out Banner or your core student management system to fix it. MuleSoft connects everything — and Data Cloud builds the unified profile on top.\n\nAdd Agentforce and you\'ve got AI guiding students through complex pathways and deflecting contact centre volume — all without a greenfield build.\n\nWorth 15 minutes?\n\nKyla Lynn-Evans\nTerritory Account Executive, Salesforce'},
+    {h:'QTAC Discovery Brief (Gio — Whitespace Priority)',ul:[
+      'QTAC runs O2 (proprietary legacy platform) for all core application data — CRM must overlay, not replace.',
+      'Every engagement channel is fully siloed: contact centre, email, SMS, website, applicant portal, and a decommissioned chatbot.',
+      'No unified customer profile exists today. Applicants sit across multiple newsletter lists with no internal visibility.',
+      'Website behavioural data is likely uncollected — Salesforce Personalisation (RTIM) is a strong differentiator worth demoing.',
+      'Goals: single unified view of applicant, AI for pathway guidance (not just application completion), B2B scope to QLD schools and colleges.',
+      'Recommended solutions: Education Cloud + Marketing Cloud + Data Cloud + Agentforce + Salesforce Personalisation + Sales Cloud + Service Cloud.',
+      'Outstanding actions: demo materials, NFP pricing eligibility (TBC from Jul 14 meeting), edu-sector implementation partners.',
+      'Competitive: go-live timeline and competing vendors still unconfirmed. NFP licensing eligibility is an outstanding action item.'
+    ]}
+  ]},
+  nsw_state_gov:{icon:'🏛️',title:'NSW State Government: AI Mandate Cold Call',desc:'Full cold call script, voicemail, emails and key intel for the NSW AI mandate opportunity. FY28 deadline creates urgency across the entire territory. IRAP is the differentiator.',sections:[
+    {h:'The Opportunity in One Line',p:'"With the FY28 AI mandate live, what\'s [Agency Name]\'s plan — and has the IRAP question come up yet?" — This works across every NSW state agency. The mandate is real, the deadline is hard, and IRAP narrows the field instantly.'},
+    {h:'Key Intel Before You Call',ul:[
+      'NSW whole-of-government AI mandate: every agency must adopt AI by FY28. This is a directive, not a suggestion. The deadline creates urgency across the entire territory.',
+      'Salesforce is IRAP-assessed for OFFICIAL:Sensitive and PROTECTED data. This is the trust credential that unlocks sensitive government conversations. Competitors without IRAP are disqualified at the security gate.',
+      'BuyICT direct sourcing: up to $450K without a tender. Removes the procurement objection and allows fast contracting for pilots.',
+      '$20K Agentforce pilot: structured entry point, low risk, designed to demonstrate ROI in 90 days and expand.',
+      'James Griffin, NSW Shadow Minister for AI, speaking at Salesforce Sydney Tower 20 August. Strong political signal that AI mandate is bipartisan and accelerating.',
+      'PSN Government Innovation Showcase (29 July): 549 registrations, 110% to target. Strong Agentforce interest from government agencies. Momentum is live in market.'
+    ]},
+    {h:'Cold Call Script: Opening',script:'"Hi [Name], [Your Name] calling from Salesforce. Quick one — with the state AI mandate and the FY28 deadline, I\'ve been having a lot of conversations with NSW agencies about where to start. I wanted to see if it\'s a conversation worth having at [Agency Name]."'},
+    {h:'Cold Call Script: Discovery Questions',ul:[
+      '"Where is [Agency Name] at with the AI mandate — is there a plan in place, or is it still early days?"',
+      '"What\'s the biggest blocker you\'d anticipate — is it data readiness, security and compliance, or internal capability?"',
+      '"Are you aware that Salesforce is IRAP-assessed? That tends to change the conversation pretty quickly in government."'
+    ]},
+    {h:'Objection Handler: "We\'re already looking at options / send me something"',script:'"Totally fair — happy to send something short. The reason I called is that most vendors at this point can\'t clear the IRAP bar, and that tends to narrow the field quickly. I\'ll send a two-pager — and if it\'s worth 20 minutes, we can go from there. Sound reasonable?"'},
+    {h:'Close',script:'"I\'ll send across something specific to the FY28 mandate and what a fast-start pilot looks like. Would [day] suit for a brief conversation with your digital transformation team?"'},
+    {h:'Voicemail Script',script:'"Hi [Name], [Your Name] from Salesforce here. I\'m calling because with the NSW AI mandate and the FY28 deadline, agencies are starting to move — and the IRAP question is becoming the differentiator. Give me a call back on [number] and I can tell you what a fast-start looks like without a tender. Happy to keep it to 15 minutes. Speak soon."'},
+    {h:'Follow-Up Email (Connected)',p:'Subject: NSW AI mandate + IRAP — what a fast-start looks like\n\nHi [Name],\n\nGreat to connect. As discussed, the FY28 deadline is creating real pressure — and the IRAP question tends to be where a lot of agency conversations land first.\n\nSalesforce is one of the only enterprise AI platforms that\'s IRAP-assessed, which means you\'re not starting from scratch on security and compliance. That\'s a meaningful difference when you\'re trying to move fast.\n\nWhat we\'re seeing work is a focused pilot using Agentforce on a high-volume service or case management workflow — contracted via BuyICT, typically up to $450K without a tender.\n\nI\'ll send across a short overview. Happy to set up 30 minutes with our Public Sector team to walk through what it looks like for [Agency Name] specifically.\n\nDoes [day] work?\n\nKyla'},
+    {h:'Outreach Email (Not Connected)',p:'Subject: FY28 AI mandate — worth 15 minutes?\n\nHi [Name],\n\nEvery NSW agency is under the same pressure right now — adopt AI by FY28, demonstrate progress, and do it on a platform the government can actually trust.\n\nThe IRAP question is where most conversations land first. Salesforce is one of the only enterprise AI platforms that\'s IRAP-assessed — which means we can move where others can\'t.\n\nAnd with BuyICT, you don\'t need a tender to get started.\n\nWorth 15 minutes to see what a fast-start looks like?\n\nKyla Lynn-Evans\nTerritory Account Executive, Salesforce'}
+  ]},
+  nsw_council_da:{icon:'🏘️',title:'NSW Council: DA Automation Cold Call',desc:'Full cold call script, voicemail, emails and key intel for the NSW DA backlog opportunity. 16 councils already in the AI Early Adopter Grant program.',sections:[
+    {h:'The Opportunity in One Line',p:'"With the housing pressure your council is under, where are the biggest workflow bottlenecks slowing approvals?" — This one question works across every NSW council. The pain is universal, the mandate is real, and the budget objection has been removed by the grant.'},
+    {h:'Key Intel Before You Call',ul:[
+      '16 NSW councils already in the AI Early Adopter Grant program trialling DA automation — including Blacktown, Canterbury Bankstown, City of Newcastle, Lake Macquarie, Wagga Wagga. These are warm reference accounts.',
+      '$5.6M state investment in AI for planning. The political will is there.',
+      'BuyICT: direct sourcing up to $450K, no tender required. Kills the procurement objection.',
+      '$20K Slack + Agentforce pilot: the door-opener. Low risk, structured to expand.',
+      'NSW Government Innovation Showcase: 549 registrations, 110% to target, strong Agentforce interest. Momentum is live.',
+      'James Griffin, NSW Shadow Minister for AI, speaking at Salesforce Sydney Tower 20 August. Political signals strongly pro-AI mandate.'
+    ]},
+    {h:'Cold Call Script: Opening',script:'"Hi [Name], it\'s [Your Name] calling from Salesforce. I\'ll be quick — we\'ve been working with a number of NSW councils on their DA workflows, and with the AI Early Adopter Grant live right now, a few councils are moving fast on this. I wanted to see if it\'s a conversation worth having at [Council Name]."'},
+    {h:'Cold Call Script: Discovery Questions',ul:[
+      '"Where\'s the biggest bottleneck in your DA process right now — is it intake, assessment, or somewhere else in the workflow?"',
+      '"With the housing targets coming from the state, how much pressure is that creating on your planning team\'s capacity?"',
+      '"Has your council looked at the AI Early Adopter Grant, or is budget still the first question you\'d need to answer internally?"'
+    ]},
+    {h:'Objection Handler: "Not interested / send me an email"',script:'"Totally understand — I\'ll keep it brief. We\'ve got a $20K pilot that a few councils are using specifically to respond to the grant. It\'s designed to be low-risk and show ROI in 90 days. I\'ll send you something short — and if it\'s relevant, we can grab 20 minutes. Fair?"'},
+    {h:'Close',script:'"I\'ll send you a quick overview of how [similar council] is using this. Would Tuesday or Thursday work for a 20-minute conversation with you and whoever owns digital transformation at your end?"'},
+    {h:'Voicemail Script',script:'"Hi [Name], [Your Name] from Salesforce here. I\'m calling because the NSW AI Early Adopter Grant is making a few councils move fast on DA automation right now — and I didn\'t want [Council Name] to miss the window. Give me a call back on [number] and I can tell you what two or three councils are doing in 90 days. Happy to keep it brief. Speak soon."'},
+    {h:'Follow-Up Email (Connected)',p:'Subject: DA automation + the Early Adopter Grant — next steps\n\nHi [Name],\n\nGood to connect. As discussed, the AI Early Adopter Grant is a genuine window to move fast without the usual budget cycle friction.\n\nWhat we\'re seeing work for councils right now is a focused Agentforce pilot on DA intake and routing — takes about 8 weeks to stand up, costs around $20K, and is structured to directly address the planning workflow pressures you mentioned.\n\nI\'ll send across a short overview of how we\'ve approached this with similar councils. Happy to set up 30 minutes with our Public Sector team to walk through what it looks like in practice.\n\nDoes [day] work for you?\n\nKyla'},
+    {h:'Outreach Email (Not Connected)',p:'Subject: DA backlogs + AI — worth 15 minutes?\n\nHi [Name],\n\nNSW councils are under real pressure on DA processing — and the state\'s AI Early Adopter Grant is creating a live window to do something about it without waiting for the next budget cycle.\n\nWe\'ve been working with councils to automate DA intake and routing using Agentforce, and we\'re seeing meaningful reductions in processing time in the first 90 days.\n\nGiven the housing mandate sitting on every council right now, I thought it was worth a quick conversation.\n\nWorth 15 minutes?\n\nKyla Lynn-Evans\nTerritory Account Executive, Salesforce'}
+  ]},
+  quality:{icon:'🎯',title:'Quality Pipeline Over Volume',desc:'Why pumping S2s for KPIs kills AE trust — and what a quality Stage 2 actually looks like.',sections:[{h:'The Volume Problem',p:'BDRs under pressure to hit Stage 2 numbers book meetings that shouldn\'t be booked. AEs take the meeting, find no real opportunity, and stop trusting BDR pipeline. Trust breaks. Partnership ends.'},{h:'What a Quality S2 Looks Like',ul:['Pain confirmed and specific — not "they\'re interested in AI"','Economic buyer identified — or at least acknowledged','Real buying timeline — not "sometime next year"','Specific use case discussed — not a generic demo request','Notes are AE-ready — they can brief themselves from your notes alone']},{h:'The Test Before You Book',script:'"If I were an AE and I read these notes, would I be excited to take this meeting? Or would I feel like I\'m going in blind?" If the answer is blind — don\'t book yet. Get one more conversation.'}]}
+};
+
+// ── STATE ──
+let ccPersona='david', discPersona='david', ccTurn=0, discTurn=0;
+let curDrill=0;
+
+// ── COLD CALL ──
+function selectP(el,key){document.querySelectorAll('#cc-selector .persona-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');ccPersona=key;}
+function startCall(){
+  document.getElementById('cc-selector').style.display='none';
+  document.getElementById('cc-call').style.display='block';
+  const p=ccData[ccPersona];
+  document.getElementById('cc-name').textContent=p.name;
+  document.getElementById('cc-role').textContent=p.role;
+  document.getElementById('cc-messages').innerHTML='';
+  document.querySelectorAll('#tab-coldcall .chk input').forEach(c=>c.checked=false);
+  updCC();
+  initCCOpener();
+}
+// ── CONTEXTUAL RESPONSE ENGINE ──
+const ccResponses = {
+  david: {
+    opening: "David Chen.",
+    permission: ["Fair enough — quick question. What specifically about citizen service delivery? We've got Teams and ServiceNow, we're not short of platforms.",
+                 "Okay. You've got 90 seconds. What's the actual problem you're solving?"],
+    pain_surface: ["Our citizen portal runs across three systems. Every policy change breaks something downstream. Last October a payment threshold change took six weeks to propagate — the contact centre volume spiked 40% while we sorted it.",
+                   "We're under a hard mandate — 25% reduction in contact centre volume by FY28. I'm at 8% improvement. Not good enough. The citizen journey is fragmented and that's the root cause."],
+    pain_impact: ["The contact centre cost alone is significant — we're talking millions annually. But the real cost is Ministerial pressure. I brief the Deputy Secretary monthly on those numbers. They're not moving fast enough.",
+                  "Every week of delay is a week where citizens are calling instead of self-serving. My KPI is measurable and I'm being watched. That's the honest answer."],
+    budget: ["$18M confirmed in the FY27 budget. I'm the economic buyer up to $5M. Above that needs a Deputy Secretary business case — but a pilot doesn't require that.",
+             "The funding is there. That's not the blocker. The blocker is finding something that actually works with our complexity. We tried Power Platform — it couldn't handle multi-party workflows."],
+    timeline: ["FY28 mandate means I need something live by Q1 FY28 at the latest. That means a decision by Q3 this year, realistically.",
+               "I'd want a proof of concept first. If it works, we move fast. If not, we cut it. I don't have time for 18-month implementations."],
+    competitor: ["We have the WofG Microsoft agreement. Teams is everywhere. Power Platform was pushed hard by IT but our architects said it can't handle the complex citizen journeys we need.",
+                 "ServiceNow manages our ITSM. Our solution architects looked at using it for citizen services — they said the architecture isn't designed for it. That was their verdict, not mine."],
+    champion: ["My technical BA Priya owns the day-to-day evaluation. She'd be involved in any technical assessment. I'd need her sign-off before I'd move forward.",
+               "The team lead for citizen services is across the current state. She's been frustrated with the three-system problem for two years. She'd be your strongest internal advocate."],
+    book: ["Okay — send something through to my EA. Tuesday afternoon works. Make it specific to ServiceNSW context, not a generic Salesforce demo. I've seen too many of those.",
+           "Fine. 30 minutes. Bring your NSW gov solution lead — I want someone who knows our landscape, not a product rep.",
+           "Fair enough. Send something through to my EA. Tuesday works. Include the Public Trustee of Queensland story — I've heard they went from behind 90% of agencies to leading 90% in 18 months. That's the kind of transformation story I need to make the case internally. Make it specific to ServiceNSW context."],
+    default: ["Tell me more about that — I don't have a lot of time so be specific.",
+              "That's interesting. Specifically how?",
+              "I've heard that before. What makes your situation different from the other vendors I've talked to?",
+              "Go on — what does that look like in practice?"]
+  },
+  marcus: {
+    opening: "Marcus Webb. Make it quick — I've got a council meeting.",
+    permission: ["Alright. What do you actually know about DA processing? Because I've heard a lot of AI pitches lately.",
+                 "90 seconds. What problem are you solving?"],
+    pain_surface: ["1,400 applications. State Government is breathing down my neck about housing approvals. My team processes everything manually — PDAs come in by email, data gets re-entered three times.",
+                   "We had a threshold change in October. Took three weeks to update across our systems. Meanwhile applications stalled. The residents complained, the councillors complained, the Minister's office called."],
+    pain_impact: ["Time is the biggest cost. My team is stretched — I've got planning officers doing admin they shouldn't be doing. That's not their job. And every delayed DA is a delayed housing approval.",
+                  "Politically it's brutal. Housing pressure is a mandate from the State Government. When DAs take too long, we get called out publicly. That lands on me."],
+    budget: ["Our IT manager's default answer is 'we can't afford implementations.' But there's the NSW AI Early Adopter Grant specifically for councils — have you looked at that? That could change the conversation.",
+             "Council budget cycle is February. Anything this year has to come from existing reserves. Under $200K I can approve. Above that needs the General Manager."],
+    timeline: ["We need movement before end of financial year. The State's watching our DA turnaround times. Dreamforce isn't a deadline for me — clearing the backlog is.",
+               "If there's a grant that covers the pilot, we could move faster. I'd need IT manager buy-in — he's always the wall."],
+    competitor: ["We're on Civica for DA management, TechOne for finance. Our IT manager loves Civica because it's familiar. Changing anything is a fight.",
+                 "We've heard about Microsoft's Power Platform. IT pushed it. Our planning team looked at it and said it couldn't handle the complexity of multi-party DA approvals."],
+    book: ["Send me the details on that grant. If the numbers check out I'll give you 30 minutes.",
+           "Fine. Get something to me by end of week. Include the case study and the grant info.",
+           "Fine — but include the QFCC story. They went live with Salesforce in 3 months. If they can do it for Reportable Conduct, I want to see how fast we could move on DA automation. Send me that and the grant info."],
+    default: ["That's fair — go on.",
+              "I've heard that before. Be specific about councils.",
+              "What does that mean practically for a team like mine?",
+              "Okay — what's the business case?"]
+  },
+  jenny: {
+    opening: "Jenny Tran, Inner West IT. What company are you from?",
+    permission: ["...okay. At least you're honest about it. What do you do?",
+                 "I appreciate that. Most vendors pretend budget isn't an issue. What is it you actually offer?"],
+    pain_surface: ["Residents complain constantly about the council website. Can't find information. Online forms don't work on mobile. They end up calling, and we don't have the staff to handle the volume.",
+                   "We're on an aging portal. It was built 10 years ago. Every change is expensive. We're on Microsoft 365 for everything internal but the citizen-facing stuff is embarrassingly bad."],
+    pain_impact: ["The GM gets emails from residents. That lands on my desk. I then have to explain why the digital experience is poor, which is a long conversation I don't want to have.",
+                  "Call centre volume has gone up 15% this year. I don't have more staff. That's the pressure I'm under."],
+    budget: ["CEO was explicit — zero new vendors this year. Full stop. We went through a bad implementation 4 years ago and the whole council is gun-shy.",
+             "February budget cycle. GM and Director of Customer Experience both need to be involved in any decision over $50K."],
+    timeline: ["Not this year. February budget is when anything could start. Even then there's no guarantee.",
+               "I'd want to see what other councils your size have done first. Inner West isn't huge — I need a proportionate solution."],
+    book: ["...send me something. One page. What it does, which councils you've worked with, what it costs. I'll decide from there.",
+           "Yeah. Send it through. I'll look at it before February."],
+    default: ["That's interesting — what does that look like for a council our size?",
+              "Go on.",
+              "I've heard that pitch before. What's different?",
+              "What councils have you actually done this with?"]
+  },
+  sarah: {
+    opening: "Sarah Okafor. Yes?",
+    permission: ["We have real concerns about AI and patient data. What specifically are you talking about?",
+                 "Briefly then. What do you do?"],
+    pain_surface: ["Legacy systems. Every time there's a policy change, something breaks downstream. Last year a clinical pathway update caused a 3-week delay. Clinicians couldn't access the updated protocols.",
+                   "Patient-facing services are fragmented. A patient dealing with a chronic condition might interact with 4 different systems. Nothing talks to each other."],
+    pain_impact: ["Clinicians are spending time on admin they shouldn't be doing. That's the direct impact. Time that should be with patients is spent navigating broken systems.",
+                  "We had a critical incident last year where a medication update wasn't propagated correctly. Patient safety implications. That's what keeps me up at night."],
+    budget: ["$8M Federal investment confirmed for FY27. I'm the program director — I can approve under $2M. Anything above needs a Deputy Secretary business case.",
+             "The funding is there but I've been burned before. FY24 we had a failed implementation that went over budget. The bar for new vendors is very high."],
+    timeline: ["FY28 mandate on reducing clinician admin by 30%. That's a hard KPI I report on quarterly.",
+               "I'd want a proof of concept with specific NSW Health data residency requirements satisfied before any broader conversation."],
+    competitor: ["We looked at ServiceNow. Our solution architects said it's ITSM-native — not built for patient-facing case management. Power Platform was pushed by IT. Couldn't handle the complexity.",
+                 "The Microsoft question is the big one. Everything is on Teams internally. But Teams doesn't own patient journeys."],
+    book: ["Send through a calendar invite. Keep it to 30 minutes and make it specific to our situation — data residency, clinical workflow complexity, integration with our existing stack.",
+           "Yes. Include your NSW Health solution lead. I want someone who knows regulated health environments."],
+    default: ["Tell me specifically what that means for a health environment.",
+              "That's the right question — go on.",
+              "How does that work with IRAP requirements?",
+              "What NHS or international health case studies do you have?"]
+  }
+};
+
+function detectIntent(text) {
+  const t = text.toLowerCase();
+  if (/impact|cost|mean|affect|result|consequence|matter|hurt|lose|lose|affect/.test(t)) return 'pain_impact';
+  if (/pain|challenge|problem|issue|struggle|difficult|hard|frustrat|annoying|broken|slow/.test(t)) return 'pain_surface';
+  if (/budget|money|cost|fund|invest|afford|spend|approv|price/.test(t)) return 'budget';
+  if (/time|when|deadline|urgency|quarter|year|soon|fast|quick|month/.test(t)) return 'timeline';
+  if (/microsoft|servicenow|techone|civica|oracle|sap|workato|competitor|incumbent|currently using|already have/.test(t)) return 'competitor';
+  if (/who|sign|approval|decision|buyer|stakeholder|involve|champion|team|colleague/.test(t)) return 'champion';
+  if (/meeting|call|demo|chat|conversation|book|schedule|time|calendar|touch base/.test(t)) return 'book';
+  if (/ok|okay|sure|yes|sounds|interested|tell me more|go on|continue/.test(t)) return 'permission';
+  return 'default';
+}
+
+let ccCallStage = 0; // 0=intro, 1=engaged, 2=pain shared, 3=qualifying, 4=ready to book
+let ccResponseLog = [];
+
+function sendCC(){
+  const inp=document.getElementById('cc-input');const t=inp.value.trim();if(!t)return;
+  inp.value='';addMsg('cc-messages','user',t);
+  ccResponseLog.push(t.toLowerCase());
+
+  const resp = ccResponses[ccPersona];
+  const intent = detectIntent(t);
+  let response;
+
+  // Stage progression logic
+  if (ccCallStage === 0) {
+    // Still in opener phase - permission/hook needed
+    const opts = resp.permission;
+    response = opts[Math.floor(Math.random()*opts.length)];
+    ccCallStage = 1;
+  } else if (intent === 'pain_impact' && ccCallStage >= 1) {
+    const opts = resp.pain_impact;
+    response = opts[Math.floor(Math.random()*opts.length)];
+    if (ccCallStage < 3) ccCallStage = 3;
+  } else if (intent === 'pain_surface' && ccCallStage >= 1) {
+    const opts = resp.pain_surface;
+    response = opts[Math.floor(Math.random()*opts.length)];
+    if (ccCallStage < 2) ccCallStage = 2;
+  } else if (intent === 'budget') {
+    const opts = resp.budget;
+    response = opts[Math.floor(Math.random()*opts.length)];
+    ccCallStage = Math.max(ccCallStage, 3);
+  } else if (intent === 'timeline') {
+    const opts = resp.timeline;
+    response = opts[Math.floor(Math.random()*opts.length)];
+    ccCallStage = Math.max(ccCallStage, 3);
+  } else if (intent === 'competitor') {
+    const opts = resp.competitor;
+    response = opts[Math.floor(Math.random()*opts.length)];
+  } else if (intent === 'champion') {
+    const opts = resp.champion || resp.default;
+    response = opts[Math.floor(Math.random()*opts.length)];
+    ccCallStage = Math.max(ccCallStage, 3);
+  } else if (intent === 'book') {
+    if (ccCallStage >= 2) {
+      // Pain has been established — prospect will book
+      const opts = resp.book;
+      response = opts[Math.floor(Math.random()*opts.length)];
+      ccCallStage = 4;
+    } else {
+      // Tried to book too early — pushback
+      response = "Look, I've got 10 vendor calls a week. Why would I give you 30 minutes? What specifically are you going to show me that I haven't already seen?";
+    }
+  } else {
+    const opts = resp.default;
+    response = opts[Math.floor(Math.random()*opts.length)];
+  }
+
+  showTyping('cc-messages');
+  setTimeout(()=>{removeTyping('cc-messages');addMsg('cc-messages','prospect',response);},1100+Math.random()*600);
+}
+
+// First message init - show prospect opener
+function initCCOpener() {
+  ccCallStage = 0;
+  ccResponseLog = [];
+  const resp = ccResponses[ccPersona];
+  setTimeout(()=>{addMsg('cc-messages','prospect', resp.opening);},600);
+}
+function updCC(){const c=document.querySelectorAll('#tab-coldcall .chk input:checked').length;document.getElementById('cc-count').textContent=c+' of 5 steps';}
+const ccFeedback = {
+  david:{score:7,good:'You opened with government context and didn\'t pitch. You referenced ServiceNSW complexity — that earned attention. Good pacing early in the call.',improve:'You moved to "book a meeting" before fully confirming the pain. After they mentioned the 6-week October delay — ask ONE more question: "How often does that happen?" before proposing a meeting.',question:'"Before we wrap — you mentioned the portal running on three systems. What does that cost you in terms of your team\'s time when something breaks?" — deeper pain confirmation before the close.'},
+  marcus:{score:8,good:'Excellent opener — you named the DA backlog specifically. That\'s what gets a council planning director to stay on the phone. You acknowledged the IT manager resistance naturally.',improve:'You proposed a 30-minute meeting at the end. That\'s good. But you could have planted the NSW AI Early Adopter Grant earlier — it removes the budget objection before it becomes one.',question:'"The grant covers the first stage of implementation — would that change the conversation with your IT manager?" — use it proactively, not just as a response.'},
+  sarah:{score:7,good:'You addressed data sovereignty proactively without being asked — that\'s exactly right for a Health prospect. Good empathy on the legacy system problem.',improve:'You didn\'t establish who else would be involved in the decision. Sarah mentioned her technical lead — that\'s your champion signal. Ask about them.',question:'"You mentioned your technical lead earlier — would it make sense to include them in the conversation? I want to make sure what I share is relevant to their evaluation criteria too."'},
+  jenny:{score:8,good:'Excellent open — you acknowledged the budget situation immediately. That\'s the only way to build trust with an IT Manager who\'s been burned by vendors before.',improve:'You got a next step but didn\'t qualify the February timeline firmly enough. Nail down who else needs to be involved.',question:'"When you say the GM and Director of Customer Experience would be involved — is that a formal panel process or more of an internal discussion? I want to make sure I\'m prepared for the right conversation."'}
+};
+
+function endCall(id) {
+  document.getElementById(id+'-call').style.display='none';
+  if(id==='cc') {
+    const fb = ccFeedback[ccPersona];
+    document.getElementById('cc-fb-title').textContent = 'Cold Call — ' + ccData[ccPersona].name;
+    document.getElementById('cc-fb-score').textContent = fb.score;
+    document.getElementById('cc-fb-good').textContent = fb.good;
+    document.getElementById('cc-fb-improve').textContent = fb.improve;
+    document.getElementById('cc-fb-question').textContent = fb.question;
+    const checks = document.querySelectorAll('#tab-coldcall .chk input:checked');
+    const criteria = [
+      {name:'Upfront Contract', earned: checks.length > 0},
+      {name:'Pain Surfaced', earned: checks.length > 1},
+      {name:'Relevance Established', earned: checks.length > 2},
+      {name:'EB / Next Step', earned: checks.length > 3},
+      {name:'Meeting Committed', earned: checks.length > 4},
+    ];
+    let chtml = '';
+    criteria.forEach(c => {
+      const score = c.earned ? Math.floor(Math.random()*2)+7 : Math.floor(Math.random()*3)+3;
+      const col = score >= 7 ? '#065F46' : score >= 5 ? '#92400E' : '#991B1B';
+      const bg = score >= 7 ? '#D1FAE5' : score >= 5 ? '#FEF3C7' : '#FEE2E2';
+      chtml += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:${bg};border-radius:8px;">
+        <span style="font-size:13px;font-weight:600;color:${col};">${c.name}</span>
+        <span style="font-size:14px;font-weight:900;color:${col};">${score}/10</span>
+      </div>`;
+    });
+    document.getElementById('cc-criteria').innerHTML = chtml;
+    document.getElementById('cc-feedback').style.display='block';
+    document.getElementById('cc-feedback').scrollIntoView({behavior:'smooth'});
+  } else {
+    document.getElementById(id+'-selector').style.display='';
+  }
+}
+
+function tryAgain() {
+  document.getElementById('cc-feedback').style.display='none';
+  document.getElementById('cc-call').style.display='block';
+  document.getElementById('cc-messages').innerHTML='';
+  document.querySelectorAll('#tab-coldcall .chk input').forEach(c=>c.checked=false);
+  updCC();
+  initCCOpener();
+}
+
+function newPersona() {
+  document.getElementById('cc-feedback').style.display='none';
+  document.getElementById('cc-selector').style.display='';
+}
+
+// ── DISCOVERY ──
+function selectDP(el,key){document.querySelectorAll('#disc-selector .persona-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');discPersona=key;}
+function startDisc(){
+  document.getElementById('disc-selector').style.display='none';
+  document.getElementById('disc-call').style.display='block';
+  document.getElementById('disc-analysis').style.display='none';
+  const p=discData[discPersona];
+  document.getElementById('disc-name').textContent=p.name;
+  document.getElementById('disc-role').textContent=p.role;
+  document.getElementById('disc-messages').innerHTML='';
+  document.querySelectorAll('#tab-discovery .meddic-item input').forEach(c=>c.checked=false);
+  discTurn=0;
+  setTimeout(()=>{addMsg('disc-messages','prospect',p.conv[discTurn].text);discTurn++;},600);
+}
+function sendDisc(){
+  const inp=document.getElementById('disc-input');const t=inp.value.trim();if(!t)return;
+  inp.value='';addMsg('disc-messages','user',t);
+  const conv=discData[discPersona].conv;
+  if(discTurn<conv.length){
+    showTyping('disc-messages');
+    setTimeout(()=>{removeTyping('disc-messages');addMsg('disc-messages','prospect',conv[discTurn].text);discTurn++;},1100+Math.random()*700);
+  }
+}
+function analyzeDisc(){
+  document.getElementById('disc-analysis').style.display='block';
+  document.getElementById('disc-analysis').scrollIntoView({behavior:'smooth'});
+}
+
+// ── LESSONS ──
+function openLesson(key){
+  const l=lessonContent[key];
+  if(!l){document.getElementById('lesson-content').innerHTML='<p style="color:#6B7280;font-size:14px;">Full lesson available in the live app at bdr-coach.onrender.com</p>';document.getElementById('lessons-list').style.display='none';document.getElementById('lesson-detail').style.display='block';return;}
+  let html=`<div style="font-size:28px;margin-bottom:12px;">${l.icon}</div><h2>${l.title}</h2><div class="desc">${l.desc}</div>`;
+  l.sections.forEach(s=>{
+    html+=`<div class="lesson-section"><h3>${s.h}</h3>`;
+    if(s.p)html+=`<p>${s.p}</p>`;
+    if(s.ul){html+='<ul>';s.ul.forEach(i=>html+=`<li>${i}</li>`);html+='</ul>';}
+    if(s.script)html+=`<div class="script-box"><strong>Your Script:</strong>${s.script}</div>`;
+    html+='</div>';
+  });
+  document.getElementById('lesson-content').innerHTML=html;
+  document.getElementById('lessons-list').style.display='none';
+  document.getElementById('lesson-detail').style.display='block';
+}
+function closelesson(){document.getElementById('lessons-list').style.display='';document.getElementById('lesson-detail').style.display='none';}
+
+// ── DRILLS ──
+function submitDrill(){
+  const r=document.getElementById('drill-response').value.trim();if(!r)return;
+  const d=objections[curDrill];
+  document.getElementById('drill-score').textContent=d.score;
+  document.getElementById('drill-grade').textContent=d.grade;
+  document.getElementById('drill-feedback-text').textContent=d.feedback;
+  document.getElementById('drill-better').textContent=d.better;
+  document.getElementById('drill-feedback').style.display='block';
+}
+function nextDrill(){
+  curDrill=(curDrill+1)%objections.length;
+  const d=objections[curDrill];
+  document.getElementById('drill-objection').textContent=d.text;
+  document.getElementById('drill-persona').textContent='— '+d.persona;
+  document.getElementById('drill-difficulty').textContent=d.diff+' difficulty';
+  document.getElementById('drill-response').value='';
+  document.getElementById('drill-feedback').style.display='none';
+}
+
+// ── PERSONAS ──
+function showPersona(key,el){
+  document.querySelectorAll('.persona-sidebar button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const p=personaData[key];
+  let html=`<h2>${p.name}</h2><div class="role">${p.role}</div><div class="org">${p.org}</div>`;
+  if(p.world){html+=`<div class="persona-section"><h4>Their World Right Now</h4><ul>${p.world.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;}
+  if(p.opens){html+=`<div class="persona-section"><h4>What Opens the Door</h4><ul>${p.opens.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;}
+  if(p.kills){html+=`<div class="persona-section"><h4>What Kills the Call</h4><ul>${p.kills.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;}
+  document.getElementById('persona-content').innerHTML=html;
+}
+
+// ── UTILS ──
+function addMsg(area,from,text){
+  const a=document.getElementById(area);
+  const d=document.createElement('div');d.className='msg '+from;
+  const lbl=from==='prospect'?(document.getElementById(area==='cc-messages'?'cc-name':'disc-name')||{textContent:'Prospect'}).textContent:'You';
+  d.innerHTML=`<div class="msg-lbl">${lbl}</div><div class="bubble">${text}</div>`;
+  a.appendChild(d);a.scrollTop=a.scrollHeight;
+}
+function showTyping(area){
+  const a=document.getElementById(area);const d=document.createElement('div');
+  d.className='msg prospect';d.id=area+'-typing';
+  d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  a.appendChild(d);a.scrollTop=a.scrollHeight;
+}
+function removeTyping(area){const t=document.getElementById(area+'-typing');if(t)t.remove();}
+function switchTab(id,el){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');el.classList.add('active');
+}
+
+// Init persona and tracker
+showPersona('cio',document.querySelector('.persona-sidebar button'));
+showBDR('phoebe', document.querySelector('#tab-tracker button'));
+</script>
 </body>
 </html>
