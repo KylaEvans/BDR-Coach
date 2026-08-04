@@ -993,9 +993,31 @@ function endCall(id) {
   if(id==='cc') {
     const fb = ccFeedback[ccPersona];
     document.getElementById('cc-fb-title').textContent = 'Cold Call — ' + ccData[ccPersona].name;
-    document.getElementById('cc-fb-score').textContent = fb.score;
-    document.getElementById('cc-fb-good').textContent = fb.good;
-    document.getElementById('cc-fb-improve').textContent = fb.improve;
+
+    // Quality check based on actual responses
+    const totalWords = ccResponseLog.reduce((sum,r)=>sum+r.split(/\s+/).filter(w=>w.length>0).length,0);
+    const avgWords = ccResponseLog.length > 0 ? totalWords / ccResponseLog.length : 0;
+    const hasQuestions = ccResponseLog.filter(r=>r.includes('?')).length;
+    const weakResponses = ccResponseLog.filter(r=>r.split(/\s+/).length < 6).length;
+    const tooFewMessages = ccResponseLog.length < 3;
+
+    let displayScore = fb.score;
+    let displayGood = fb.good;
+    let displayImprove = fb.improve;
+
+    if(tooFewMessages || avgWords < 5) {
+      displayScore = 2;
+      displayGood = 'The call was too short to evaluate properly. A cold call needs at least 3-4 exchanges to establish pain and earn a next step.';
+      displayImprove = 'You need to engage more — ask about their current situation, surface the pain, confirm there\'s a reason to meet. One or two messages won\'t get you a Stage 2.';
+    } else if(weakResponses > ccResponseLog.length * 0.5 || hasQuestions < 1) {
+      displayScore = 4;
+      displayGood = 'You stayed in the conversation, which is a start.';
+      displayImprove = 'Your responses were too short and you didn\'t ask enough questions. A government buyer stays on the phone because they feel understood, not pitched at. Ask about their situation, their pain, their timeline.';
+    }
+
+    document.getElementById('cc-fb-score').textContent = displayScore;
+    document.getElementById('cc-fb-good').textContent = displayGood;
+    document.getElementById('cc-fb-improve').textContent = displayImprove;
     document.getElementById('cc-fb-question').textContent = fb.question;
     const checks = document.querySelectorAll('#tab-coldcall .chk input:checked');
     const criteria = [
@@ -1061,8 +1083,22 @@ function sendDisc(){
   }
 }
 function analyzeDisc(){
-  document.getElementById('disc-analysis').style.display='block';
-  document.getElementById('disc-analysis').scrollIntoView({behavior:'smooth'});
+  // Collect all user messages from discovery
+  const msgs = Array.from(document.querySelectorAll('#disc-messages .msg.user')).map(m=>m.textContent.trim());
+  const totalWords = msgs.reduce((sum,m)=>sum+m.split(/\s+/).filter(w=>w.length>0).length,0);
+  const avgWords = msgs.length > 0 ? totalWords / msgs.length : 0;
+  const questions = msgs.filter(m=>m.includes('?')).length;
+  const shortMsgs = msgs.filter(m=>m.split(/\s+/).length < 5).length;
+
+  // Override static analysis if quality is poor
+  const analysisEl = document.getElementById('disc-analysis');
+  if(msgs.length < 2 || avgWords < 5) {
+    analysisEl.innerHTML = '<div style="padding:20px;background:#FEE2E2;border-radius:10px;border-left:4px solid #991B1B;"><h3 style="color:#991B1B;margin-bottom:8px;">Discovery ended too early</h3><p style="color:#7F1D1D;font-size:14px;line-height:1.6;">You need at least 3-4 substantive questions to run a discovery. The goal is to uncover Metrics, Economic Buyer, Decision Criteria, Decision Process, Pain, and Champion — you can\'t do that in one or two messages. Start again and ask deeper questions.</p></div>';
+  } else if(questions < 2 || shortMsgs > msgs.length * 0.5) {
+    analysisEl.innerHTML = '<div style="padding:20px;background:#FEF3C7;border-radius:10px;border-left:4px solid #D97706;"><h3 style="color:#92400E;margin-bottom:8px;">Discovery needs more depth</h3><p style="color:#78350F;font-size:14px;line-height:1.6;">You asked ' + questions + ' question' + (questions===1?'':'s') + ' in ' + msgs.length + ' messages. Good discovery requires open-ended questions that uncover real pain. Short statements won\'t surface what an AE needs. Ask: What does that cost you? Who else is involved? What\'s your timeline? What would good look like?</p></div>';
+  }
+  analysisEl.style.display='block';
+  analysisEl.scrollIntoView({behavior:'smooth'});
 }
 
 // ── LESSONS ──
