@@ -1087,9 +1087,28 @@ function closelesson(){document.getElementById('lessons-list').style.display='';
 function submitDrill(){
   const r=document.getElementById('drill-response').value.trim();if(!r)return;
   const d=objections[curDrill];
-  document.getElementById('drill-score').textContent=d.score;
-  document.getElementById('drill-grade').textContent=d.grade;
-  document.getElementById('drill-feedback-text').textContent=d.feedback;
+  const words=r.split(/\s+/).filter(w=>w.length>0).length;
+  const hasQuestion=r.includes('?');
+  const hasSubstance=words>=20;
+  const vague=/^(because|it's better|salesforce is better|we're better|just|that's why|it is|yes|no)\b/i.test(r)||words<8;
+
+  let score,grade,feedback;
+  if(vague||words<8){
+    score='2/10';
+    grade='Needs work — this won\'t land with a government buyer';
+    feedback='This response doesn\'t acknowledge the prospect\'s reality or give them a reason to keep listening. Government buyers have heard "we\'re better" before. You need to meet them where they are, validate their current setup, then introduce a specific gap. Try again — what specific problem does Salesforce solve that Microsoft can\'t?';
+  } else if(!hasSubstance||!hasQuestion){
+    score='5/10';
+    grade='Getting there — add a question to open the conversation';
+    feedback='You\'re starting to address the objection but the response needs more substance. Validate what they have (Microsoft is great for X), introduce the specific gap (but when it comes to Y...), then end with a question that surfaces their pain. The question is what keeps the conversation going.';
+  } else {
+    score=d.score;
+    grade=d.grade;
+    feedback=d.feedback;
+  }
+  document.getElementById('drill-score').textContent=score;
+  document.getElementById('drill-grade').textContent=grade;
+  document.getElementById('drill-feedback-text').textContent=feedback;
   document.getElementById('drill-better').textContent=d.better;
   document.getElementById('drill-feedback').style.display='block';
 }
